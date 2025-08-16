@@ -1,0 +1,5 @@
+cd backend
+commande pour active env : venv\Scripts\activate 
+remplire base de donnes : python app\ingest_csv.py
+lancer app : uvicorn app.main:app --reload --port 8011
+
