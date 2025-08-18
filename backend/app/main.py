@@ -8,6 +8,7 @@ from .routers import production
 from .routers import storage
 from .routers import distribution
 from .routers import consumers
+from .routers import network_quality
 
 
 
@@ -38,6 +39,7 @@ app.include_router(production.router)
 app.include_router(storage.router)
 app.include_router(distribution.router)
 app.include_router(consumers.router)
+app.include_router(network_quality.router)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8011)

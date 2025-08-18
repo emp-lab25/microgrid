@@ -8,7 +8,6 @@ import csv
 from io import StringIO
 
 router = APIRouter(prefix="/consumers", tags=["Consumers"])
-
 Base.metadata.create_all(bind=engine)
 
 from typing import List

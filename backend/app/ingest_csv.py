@@ -2,6 +2,8 @@ import pandas as pd
 from sqlalchemy.orm import Session
 from models.measurement import Measurement, Base
 from database import engine, SessionLocal
+import numpy as np
+
 
 # Créer les tables si elles n'existent pas
 Base.metadata.create_all(bind=engine)
@@ -35,6 +37,16 @@ df.rename(columns={
 # Convertir timestamp et changer l'année 2022 -> 2025
 df['timestamp'] = pd.to_datetime(df['timestamp'])
 df['timestamp'] = df['timestamp'].apply(lambda x: x.replace(year=2025) if x.year == 2022 else x)
+
+
+# === Remplacer les 0 ou valeurs nulles par la moyenne ===
+for col in df.columns:
+    if col != "timestamp":  # on ne touche pas au timestamp
+        if pd.api.types.is_numeric_dtype(df[col]):
+            mean_val = df[col][df[col] != 0].mean()  # moyenne sans compter les 0
+            df[col] = df[col].replace(0, np.nan)     # remplacer 0 par NaN
+            df[col] = df[col].fillna(mean_val)       # remplacer NaN par la moyenne
+
 
 # === Nettoyage des valeurs incohérentes / extrêmes ===
 
@@ -95,7 +107,7 @@ for col in fill_mean_cols:
 # print(df.isna().sum())
 
 # print("\n=== Statistiques descriptives après nettoyage ===")
-# print(df.describe())
+print(df.describe())
 
 #  Insérer les données dans PostgreSQL
 session: Session = SessionLocal()

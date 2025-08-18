@@ -1,0 +1,153 @@
+/* ===============================
+   Microgrid Theme CSS
+   =============================== */
+
+/* ------------------------------
+   Variables pour le mode clair
+------------------------------- */
+:root {
+  --microgrid-primary: #2d4734;
+  --microgrid-secondary: #6a8e4e;
+  --microgrid-light: #f4efe9;
+  --microgrid-neon-green: #00ff88;
+  --microgrid-neon-blue: #00d4ff;
+  --microgrid-neon-orange: #ff8c00;
+  --microgrid-neon-purple: #b347ff;
+
+  --background: #f4efe9;
+  --foreground: #2d4734;
+  --card: #ffffff;
+  --card-foreground: #2d4734;
+  --popover: #ffffff;
+  --popover-foreground: #2d4734;
+  --primary: #2d4734;
+  --primary-foreground: #f4efe9;
+  --secondary: #6a8e4e;
+  --secondary-foreground: #f4efe9;
+  --muted: #e8ddd4;
+  --muted-foreground: #6a8e4e;
+  --accent: #6a8e4e;
+  --accent-foreground: #f4efe9;
+  --destructive: #b34700; /* approximation couleur oklch */
+  --destructive-foreground: #b34700;
+  --border: #ccc;
+  --input: #ccc;
+  --ring: #bbb;
+  --chart-1: #66aa77;
+  --chart-2: #6699ff;
+  --chart-3: #aa66ff;
+  --chart-4: #88cc44;
+  --chart-5: #cc8844;
+  --radius: 0.625rem;
+  --sidebar: #fff;
+  --sidebar-foreground: #2d4734;
+  --sidebar-primary: #337744;
+  --sidebar-primary-foreground: #fff;
+  --sidebar-accent: #97ff00;
+  --sidebar-accent-foreground: #204000;
+  --sidebar-border: #ccc;
+  --sidebar-ring: #bbb;
+}
+
+/* ------------------------------
+   Mode sombre
+------------------------------- */
+body.dark {
+  --background: #2d4734;
+  --foreground: #f4efe9;
+  --card: #3a5a42;
+  --card-foreground: #f4efe9;
+  --popover: #3a5a42;
+  --popover-foreground: #f4efe9;
+  --primary: #f4efe9;
+  --primary-foreground: #2d4734;
+  --secondary: #6a8e4e;
+  --secondary-foreground: #f4efe9;
+  --muted: #4a6b52;
+  --muted-foreground: #c4b8a8;
+  --accent: #6a8e4e;
+  --accent-foreground: #f4efe9;
+  --destructive: #994400; /* approximation couleur oklch */
+  --destructive-foreground: #994400;
+  --border: #444;
+  --input: #444;
+  --ring: #666;
+  --chart-1: #88ccff;
+  --chart-2: #77bb88;
+  --chart-3: #cc8844;
+  --chart-4: #9966cc;
+  --chart-5: #aabb55;
+  --sidebar: #205522;
+  --sidebar-foreground: #f4efe9;
+  --sidebar-primary: #88ccff;
+  --sidebar-primary-foreground: #f4efe9;
+  --sidebar-accent: #448844;
+  --sidebar-accent-foreground: #f4efe9;
+  --sidebar-border: #333;
+  --sidebar-ring: #666;
+}
+
+/* ------------------------------
+   Styles globaux
+------------------------------- */
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.card {
+  background-color: var(--card);
+  color: var(--card-foreground);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin: 1rem 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border: 1px solid var(--border);
+}
+
+button {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.sidebar {
+  width: 200px;
+  background-color: var(--sidebar);
+  color: var(--sidebar-foreground);
+  height: 100vh;
+  padding: 1rem;
+  position: fixed;
+  border-right: 1px solid var(--sidebar-border);
+}
+
+.content {
+  margin-left: 220px;
+  padding: 1rem;
+}
+
+h1,h2,h3,h4,h5,h6 {
+  color: var(--foreground);
+}
+
+/* ------------------------------
+   Graphiques
+------------------------------- */
+.chart-1 { color: var(--chart-1); }
+.chart-2 { color: var(--chart-2); }
+.chart-3 { color: var(--chart-3); }
+.chart-4 { color: var(--chart-4); }
+.chart-5 { color: var(--chart-5); }
+
+
+
