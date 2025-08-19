@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import {
@@ -11,9 +10,10 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-export default function Production() {
+export default function Stockage() {
   const API_URL = process.env.REACT_APP_API_URL;
-    // Formatage date du jour
+  
+  // Formatage date du jour
   const todayDate = new Date().toLocaleDateString("fr-FR", {
     weekday: "long",
     day: "numeric",
@@ -21,7 +21,7 @@ export default function Production() {
     year: "numeric",
   });
 
-  //   garder que l'heure
+  // Garder que l'heure
   const formatDataWithHour = (data) =>
     data.map((d) => ({
       ...d,
@@ -30,82 +30,54 @@ export default function Production() {
         minute: "2-digit",
       }),
     }));
-  // console.log(" API_URL utilisée:", API_URL);
 
-  const [batteryPowerData, setBatteryPowerData] = useState([]);
-  const [batteryResponseData, setBatteryResponseData] = useState([]);
-  const [pvPowerData, setPvPowerData] = useState([]);
-  const [fuelCellData, setFuelCellData] = useState([]);
+  const [batterySocData, setBatterySocData] = useState([]);
+  const [fuelCellContributionData, setFuelCellContributionData] = useState([]);
   const [kpis, setKpis] = useState({
-    renewable_percentage: 0,
-    battery_efficiency: 0,
-    fuel_cell_reliability: 0,
+    battery_autonomy_h: 0,
+    fuelcell_contribution_percent: 0,
+    alerts: {
+      low_battery: false,
+      fuelcell_failure: false
+    }
   });
 
   useEffect(() => {
     if (!API_URL) {
-      console.error("❌ NEXT_PUBLIC_API_URL est vide. Vérifie ton .env.local");
+      console.error("❌ REACT_APP_API_URL est vide. Vérifie ton .env");
       return;
     }
 
     async function fetchData() {
       try {
         const endpoints = {
-          batteryPower: `${API_URL}/production/battery_power`,
-          batteryResponse: `${API_URL}/production/battery_set_response`,
-          pvPower: `${API_URL}/production/pv_power`,
-          fuelCell: `${API_URL}/production/fuel_cell`,
-          renewable: `${API_URL}/production/kpi/renewable_percentage`,
-          batteryEff: `${API_URL}/production/kpi/battery_efficiency`,
-          fuelReliability: `${API_URL}/production/kpi/fuel_cell_reliability`,
+          batterySoc: `${API_URL}/storage/battery_soc`,
+          fuelCellContribution: `${API_URL}/storage/fuelcell_contribution`,
+          kpis: `${API_URL}/storage/kpis`,
         };
-    const [
-      batteryPowerRes,
-      batteryResponseRes,
-      pvPowerRes,
-      fuelCellRes,
-      renewableRes,
-      batteryEffRes,
-      fuelReliabilityRes,
-    ] = await Promise.all([
-      axios.get(endpoints.batteryPower),
-      axios.get(endpoints.batteryResponse),
-      axios.get(endpoints.pvPower),
-      axios.get(endpoints.fuelCell),
-      axios.get(endpoints.renewable),
-      axios.get(endpoints.batteryEff),
-      axios.get(endpoints.fuelReliability),
-    ]);
 
-    //  Logs pour inspecter la structure
-    // console.log("🔋 batteryPowerRes:", batteryPowerRes);
-    // console.log("📈 batteryResponseRes:", batteryResponseRes);
-    // console.log("☀️ pvPowerRes:", pvPowerRes);
-    // console.log("⚡ fuelCellRes:", fuelCellRes);
-    // console.log("🌱 renewableRes:", renewableRes);
-    // console.log("🔌 batteryEffRes:", batteryEffRes);
-    // console.log("🛠 fuelReliabilityRes:", fuelReliabilityRes);
+        const [
+          batterySocRes,
+          fuelCellContributionRes,
+          kpisRes,
+        ] = await Promise.all([
+          axios.get(endpoints.batterySoc),
+          axios.get(endpoints.fuelCellContribution),
+          axios.get(endpoints.kpis),
+        ]);
 
-    // setBatteryPowerData(batteryPowerRes.data);
-    // setBatteryResponseData(batteryResponseRes.data);
-    // setPvPowerData(pvPowerRes.data);
-    // setFuelCellData(fuelCellRes.data);
+        // Logs pour inspecter la structure
+        console.log("🔋 batterySocRes:", batterySocRes);
+        console.log("⚡ fuelCellContributionRes:", fuelCellContributionRes);
+        console.log("📊 kpisRes:", kpisRes);
 
-    setBatteryPowerData(formatDataWithHour(batteryPowerRes.data));
-    setBatteryResponseData(formatDataWithHour(batteryResponseRes.data));
-    setPvPowerData(formatDataWithHour(pvPowerRes.data));
-    setFuelCellData(formatDataWithHour(fuelCellRes.data));
+        setBatterySocData(formatDataWithHour(batterySocRes.data));
+        setFuelCellContributionData(formatDataWithHour(fuelCellContributionRes.data));
+        setKpis(kpisRes.data);
 
-    const newKpis = {
-      renewable_percentage: renewableRes.data.renewable_percentage,
-      battery_efficiency: batteryEffRes.data.battery_efficiency,
-      fuel_cell_reliability: fuelReliabilityRes.data.fuel_cell_reliability,
-    };
-
-    setKpis(newKpis);
-        console.log("Nouvelle valeur KPIs:", newKpis);
+        console.log("Nouvelles valeurs KPIs Storage:", kpisRes.data);
       } catch (error) {
-        console.error("❌ Erreur lors du fetch des données :", error);
+        console.error("❌ Erreur lors du fetch des données storage :", error);
       }
     }
 
@@ -114,9 +86,12 @@ export default function Production() {
 
   // Animation des KPIs
   const [animatedKpis, setAnimatedKpis] = useState({
-    renewable_percentage: 0,
-    battery_efficiency: 0,
-    fuel_cell_reliability: 0,
+    battery_autonomy_h: 0,
+    fuelcell_contribution_percent: 0,
+    alerts: {
+      low_battery: false,
+      fuelcell_failure: false
+    }
   });
 
   useEffect(() => {
@@ -127,19 +102,19 @@ export default function Production() {
   }, [kpis]);
 
   useEffect(() => {
-    console.log("KPIs mis à jour :", kpis);
+    console.log("KPIs Storage mis à jour :", kpis);
   }, [kpis]);
 
   // Composant KPI Card
-  const KpiCard = ({ title, value, unit, gradientClass, icon }) => (
-    <div className="kpi-card">
+  const KpiCard = ({ title, value, unit, gradientClass, icon, isAlert = false }) => (
+    <div className={`kpi-card ${isAlert ? 'kpi-alert' : ''}`}>
       <div className="kpi-card-header">
         <div className={`kpi-icon ${gradientClass}`}>
           <span className="kpi-icon-emoji">{icon}</span>
         </div>
         <div className="kpi-values">
           <p className="kpi-value">
-            {value.toFixed(1)}{unit}
+            {typeof value === 'string' ? value : `${value.toFixed(1)}${unit}`}
           </p>
           <p className="kpi-title">{title}</p>
         </div>
@@ -147,7 +122,9 @@ export default function Production() {
       <div className="kpi-progress-container">
         <div
           className={`kpi-progress ${gradientClass}`}
-          style={{ width: `${Math.min(value, 100)}%` }}
+          style={{ 
+            width: typeof value === 'string' ? '100%' : `${Math.min(value, 100)}%` 
+          }}
         ></div>
       </div>
     </div>
@@ -157,13 +134,12 @@ export default function Production() {
   const ChartCard = ({ title, data, lines, height = 300 }) => (
     <div className="chart-card">
       <h3 className="chart-title">{title}</h3>
-      <p className="chart-date"  style={{
-    textAlign: "right",
-    width: "100%",
-    fontSize: "14px",
-    color: "var(--text-secondary)",
-    // marginTop: "-24px", // optionnel pour remonter si besoin
-  }}>{todayDate}</p>
+      <p className="chart-date" style={{
+        textAlign: "right",
+        width: "100%",
+        fontSize: "14px",
+        color: "var(--text-secondary)",
+      }}>{todayDate}</p>
 
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={height}>
@@ -206,12 +182,37 @@ export default function Production() {
     </div>
   );
 
+  // Composant Alert Status
+  const AlertStatus = ({ alerts }) => {
+    const hasAlerts = alerts.low_battery || alerts.fuelcell_failure;
+    
+    return (
+      <div className={`alert-status ${hasAlerts ? 'alert-active' : 'alert-normal'}`}>
+        <div className="alert-icon">
+          <span>{hasAlerts ? '⚠️' : '✅'}</span>
+        </div>
+        <div className="alert-content">
+          <p className="alert-title">
+            {hasAlerts ? 'Alertes Actives' : 'Système Normal'}
+          </p>
+          <div className="alert-details">
+            {alerts.low_battery && <span className="alert-item">🔋 Batterie Faible</span>}
+            
+            {alerts.fuelcell_failure && <span className="alert-item">⚡ PAC Hors Service</span>}
+            
+            {!hasAlerts && <span className="alert-item">Tous systèmes opérationnels</span>}
+            
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       <style jsx>{`
-        /* Utilise les mêmes variables CSS que Navigation */
-        .production-container {
-          // padding: 30px;
+        /* Utilise les mêmes variables CSS que Production */
+        .storage-container {
           padding: 5%;
           padding-left: 8%;
           background-color: var(--bg-secondary);
@@ -220,12 +221,12 @@ export default function Production() {
         }
 
         /* Header Section */
-        .production-header {
+        .storage-header {
           margin-bottom: 40px;
           animation: fadeInUp 0.6s ease-out;
         }
 
-        .production-title {
+        .storage-title {
           font-size: 32px;
           font-weight: 700;
           color: var(--text-primary);
@@ -236,22 +237,16 @@ export default function Production() {
           -webkit-text-fill-color: transparent;
         }
 
-        .production-subtitle {
+        .storage-subtitle {
           font-size: 16px;
           color: var(--text-secondary);
           font-weight: 400;
         }
 
-        /* KPI Cards 
+        /* KPI Cards */
         .kpi-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: 25px;
-          margin-bottom: 40px;
-        }*/
-       .kpi-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr); /* Toujours 3 KPI sur une ligne */
+          grid-template-columns: repeat(3, 1fr);
           gap: 25px;
           margin-bottom: 40px;
         }
@@ -268,6 +263,11 @@ export default function Production() {
           overflow: hidden;
         }
 
+        .kpi-card.kpi-alert {
+          border-color: #ff6b6b;
+          box-shadow: 0 8px 32px rgba(255, 107, 107, 0.2);
+        }
+
         .kpi-card:hover {
           transform: translateY(-8px) scale(1.02);
           box-shadow: 0 16px 48px var(--shadow);
@@ -281,6 +281,10 @@ export default function Production() {
           right: 0;
           height: 3px;
           background: linear-gradient(90deg, var(--text-secondary), #6a8e4e);
+        }
+
+        .kpi-card.kpi-alert::before {
+          background: linear-gradient(90deg, #ff6b6b, #ff8e8e);
         }
 
         .kpi-card-header {
@@ -308,8 +312,12 @@ export default function Production() {
           background: linear-gradient(135deg, #2d473e, #1a2e23);
         }
 
-        .kpi-icon.purple {
-          background: linear-gradient(135deg, #5a4a6b, #3a2e4a);
+        .kpi-icon.orange {
+          background: linear-gradient(135deg, #f4a261, #e76f51);
+        }
+
+        .kpi-icon.red {
+          background: linear-gradient(135deg, #ff6b6b, #ee5a24);
         }
 
         .kpi-card:hover .kpi-icon {
@@ -365,8 +373,12 @@ export default function Production() {
           background: linear-gradient(90deg, #2d473e, #1a2e23);
         }
 
-        .kpi-progress.purple {
-          background: linear-gradient(90deg, #5a4a6b, #3a2e4a);
+        .kpi-progress.orange {
+          background: linear-gradient(90deg, #f4a261, #e76f51);
+        }
+
+        .kpi-progress.red {
+          background: linear-gradient(90deg, #ff6b6b, #ee5a24);
         }
 
         .kpi-progress::after {
@@ -380,12 +392,62 @@ export default function Production() {
           animation: shimmer 2s infinite;
         }
 
+        /* Alert Status */
+        .alert-status {
+          background: var(--bg-primary);
+          border-radius: 16px;
+          padding: 25px;
+          margin-bottom: 40px;
+          box-shadow: 0 8px 32px var(--shadow);
+          border: 1px solid var(--border-color);
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          transition: all 0.4s ease;
+        }
+
+        .alert-status.alert-active {
+          border-color: #ff6b6b;
+          background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 107, 107, 0.05));
+        }
+
+        .alert-status.alert-normal {
+          border-color: #6a8e4e;
+          background: linear-gradient(135deg, rgba(106, 142, 78, 0.1), rgba(106, 142, 78, 0.05));
+        }
+
+        .alert-icon {
+          font-size: 32px;
+          min-width: 50px;
+          text-align: center;
+        }
+
+        .alert-title {
+          font-size: 18px;
+          font-weight: 600;
+          margin-bottom: 8px;
+          color: var(--text-primary);
+        }
+
+        .alert-details {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+        }
+
+        .alert-item {
+          background: var(--bg-secondary);
+          padding: 6px 12px;
+          border-radius: 20px;
+          font-size: 14px;
+          color: var(--text-secondary);
+          border: 1px solid var(--border-color);
+        }
+
         /* Chart Cards */
         .charts-grid {
           display: grid;
-          // grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
           grid-template-columns: repeat(2, 1fr);
-
           gap: 25px;
         }
 
@@ -447,7 +509,7 @@ export default function Production() {
 
         /* Responsive Design */
         @media (max-width: 768px) {
-          .production-container {
+          .storage-container {
             padding: 20px;
           }
 
@@ -461,7 +523,7 @@ export default function Production() {
             gap: 20px;
           }
 
-          .production-title {
+          .storage-title {
             font-size: 24px;
           }
 
@@ -471,6 +533,11 @@ export default function Production() {
 
           .chart-card {
             padding: 20px;
+          }
+
+          .alert-status {
+            flex-direction: column;
+            text-align: center;
           }
         }
 
@@ -484,121 +551,66 @@ export default function Production() {
           .kpi-values {
             text-align: center;
           }
+
+          .alert-details {
+            justify-content: center;
+          }
         }
       `}</style>
 
-      <div className="production-container">
+      <div className="storage-container">
         {/* Header */}
-        <div className="production-header">
-          <h1 className="production-title">Production Énergétique</h1>
-          <p className="production-subtitle">
-            Surveillance en temps réel de la production et des performances du système
+        <div className="storage-header">
+          <h1 className="storage-title">Système de Stockage</h1>
+          <p className="storage-subtitle">
+            Surveillance en temps réel du stockage d'énergie et des performances
           </p>
         </div>
+
+        {/* Status des alertes */}
+        <AlertStatus alerts={animatedKpis.alerts} />
 
         {/* KPIs */}
         <div className="kpi-grid">
           <KpiCard
-            title="Énergie Renouvelable"
-            value={animatedKpis.renewable_percentage}
-            unit="%"
-            gradientClass="green"
-            icon="🌱"
-          />
-          <KpiCard
-            title="Efficacité Batterie"
-            value={animatedKpis.battery_efficiency}
-            unit="%"
+            title="Autonomie Batterie"
+            value={animatedKpis.battery_autonomy_h === 'Infini' ? 'Infini' : animatedKpis.battery_autonomy_h}
+            unit="h"
             gradientClass="blue"
             icon="🔋"
           />
           <KpiCard
-            // title="Fiabilité Pile à Combustible"
-            title="Fiabilité PAC"
-            value={animatedKpis.fuel_cell_reliability}
+            title="Contribution PAC"
+            value={animatedKpis.fuelcell_contribution_percent}
             unit="%"
-            gradientClass="purple"
+            gradientClass="orange"
             icon="⚡"
+          />
+          <KpiCard
+            title="État Système"
+            value={animatedKpis.alerts?.low_battery || animatedKpis.alerts?.fuelcell_failure ? "Alerte" : "Normal"}
+            unit=""
+            gradientClass={animatedKpis.alerts?.low_battery || animatedKpis.alerts?.fuelcell_failure ? "red" : "green"}
+            icon={animatedKpis.alerts?.low_battery || animatedKpis.alerts?.fuelcell_failure ? "⚠️" : "✅"}
+            isAlert={animatedKpis.alerts?.low_battery || animatedKpis.alerts?.fuelcell_failure}
           />
         </div>
 
         {/* Graphiques */}
         <div className="charts-grid">
           <ChartCard
-            title="Puissance Batterie (kW)"
-            data={batteryPowerData}
-            lines={[{ key: "battery_power", color: "#6a8e4e" }]}
+            title="État de Charge Batterie (%)"
+            data={batterySocData}
+            lines={[{ key: "soc", color: "#081cf8ff" }]}
           />
 
           <ChartCard
-            title="Réponse Batterie vs Consigne"
-            data={batteryResponseData}
-            lines={[
-              { key: "battery_power", color: "#814e8eff" },
-              { key: "battery_set_response", color: "#74f1ffff" },
-            ]}
-          />
-
-          <ChartCard
-            title="Production Photovoltaïque (kW)"
-            data={pvPowerData}
-            lines={[{ key: "pv_power", color: "#f4a261" }]}
-          />
-
-          <ChartCard
-            title="Pile à Combustible - Performance"
-            data={fuelCellData}
-            lines={[
-              { key: "fc_power", color: "#5a4a6b" },
-              { key: "fc_setpoint", color: "#3a2e4a" },
-              { key: "fc_set_response", color: "#8b7ba8" },
-            ]}
+            title="Contribution Pile à Combustible (%)"
+            data={fuelCellContributionData}
+            lines={[{ key: "fuelcell_contribution", color: "#f4a261" }]}
           />
         </div>
       </div>
     </>
   );
 }
-
-// Sample data
-// const batteryPowerData = [
-//   { timestamp: "00:00", battery_power: 45 },
-//   { timestamp: "04:00", battery_power: 52 },
-//   { timestamp: "08:00", battery_power: 38 },
-//   { timestamp: "12:00", battery_power: 65 },
-//   { timestamp: "16:00", battery_power: 58 },
-//   { timestamp: "20:00", battery_power: 42 },
-// ]
-
-// const batteryResponseData = [
-//   { timestamp: "00:00", battery_power: 45, battery_set_response: 48 },
-//   { timestamp: "04:00", battery_power: 52, battery_set_response: 55 },
-//   { timestamp: "08:00", battery_power: 38, battery_set_response: 40 },
-//   { timestamp: "12:00", battery_power: 65, battery_set_response: 62 },
-//   { timestamp: "16:00", battery_power: 58, battery_set_response: 60 },
-//   { timestamp: "20:00", battery_power: 42, battery_set_response: 45 },
-// ]
-
-// const pvPowerData = [
-//   { timestamp: "00:00", pv_power: 0 },
-//   { timestamp: "04:00", pv_power: 15 },
-//   { timestamp: "08:00", pv_power: 45 },
-//   { timestamp: "12:00", pv_power: 85 },
-//   { timestamp: "16:00", pv_power: 65 },
-//   { timestamp: "20:00", pv_power: 10 },
-// ]
-
-// const fuelCellData = [
-//   { timestamp: "00:00", fc_power: 25, fc_setpoint: 30, fc_set_response: 28 },
-//   { timestamp: "04:00", fc_power: 32, fc_setpoint: 35, fc_set_response: 34 },
-//   { timestamp: "08:00", fc_power: 28, fc_setpoint: 30, fc_set_response: 29 },
-//   { timestamp: "12:00", fc_power: 40, fc_setpoint: 42, fc_set_response: 41 },
-//   { timestamp: "16:00", fc_power: 35, fc_setpoint: 38, fc_set_response: 37 },
-//   { timestamp: "20:00", fc_power: 30, fc_setpoint: 32, fc_set_response: 31 },
-// ]
-
-// const kpis = {
-//   renewable_percentage: 78.5,
-//   battery_efficiency: 94.2,
-//   fuel_cell_reliability: 98.7,
-// }

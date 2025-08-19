@@ -70,6 +70,7 @@
 #         "dependance_reseau_percent": round(dependence_reseau_percent, 2),
 #         "critical_ratio_percent": round(critical_ratio, 2)
 #     }
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
