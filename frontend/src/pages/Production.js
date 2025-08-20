@@ -103,7 +103,7 @@ export default function Production() {
     };
 
     setKpis(newKpis);
-        console.log("Nouvelle valeur KPIs:", newKpis);
+        // console.log("Nouvelle valeur KPIs:", newKpis);
       } catch (error) {
         console.error("❌ Erreur lors du fetch des données :", error);
       }
@@ -127,7 +127,7 @@ export default function Production() {
   }, [kpis]);
 
   useEffect(() => {
-    console.log("KPIs mis à jour :", kpis);
+    // console.log("KPIs mis à jour :", kpis);
   }, [kpis]);
 
   // Composant KPI Card

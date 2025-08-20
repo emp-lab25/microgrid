@@ -35,7 +35,6 @@ const handleExportPDF = async () => {
     const pageHeight = pdf.internal.pageSize.getHeight() - 30; 
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    // ✅ Titre
     pdf.setFontSize(18);
     pdf.text("Rapport : Qualité Réseau", 15, 15);
 
@@ -133,7 +132,6 @@ const handleExportPDF = async () => {
           }),
         }));
         setPredictionData(formattedPredictions);
-console.log(formattedPredictions) ;
         // console.log("Nouvelles valeurs KPIs Qualité Réseau:", kpisRes.data);
       } catch (error) {
         console.error("❌ Erreur lors du fetch des données qualité réseau :", error);

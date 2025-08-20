@@ -67,15 +67,15 @@ export default function Stockage() {
         ]);
 
         // Logs pour inspecter la structure
-        console.log("🔋 batterySocRes:", batterySocRes);
-        console.log("⚡ fuelCellContributionRes:", fuelCellContributionRes);
-        console.log("📊 kpisRes:", kpisRes);
+        // console.log("🔋 batterySocRes:", batterySocRes);
+        // console.log("⚡ fuelCellContributionRes:", fuelCellContributionRes);
+        // console.log("📊 kpisRes:", kpisRes);
 
         setBatterySocData(formatDataWithHour(batterySocRes.data));
         setFuelCellContributionData(formatDataWithHour(fuelCellContributionRes.data));
         setKpis(kpisRes.data);
 
-        console.log("Nouvelles valeurs KPIs Storage:", kpisRes.data);
+        // console.log("Nouvelles valeurs KPIs Storage:", kpisRes.data);
       } catch (error) {
         console.error("❌ Erreur lors du fetch des données storage :", error);
       }
@@ -102,7 +102,7 @@ export default function Stockage() {
   }, [kpis]);
 
   useEffect(() => {
-    console.log("KPIs Storage mis à jour :", kpis);
+    // console.log("KPIs Storage mis à jour :", kpis);
   }, [kpis]);
 
   // Composant KPI Card

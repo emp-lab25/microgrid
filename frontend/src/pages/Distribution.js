@@ -75,7 +75,7 @@ export default function Distribution() {
         setConsumptionBreakdownData(formatDataWithHour(consumptionBreakdownRes.data));
         setKpis(kpisRes.data);
 
-        console.log("Nouvelles valeurs KPIs Distribution:", kpisRes.data);
+        // console.log("Nouvelles valeurs KPIs Distribution:", kpisRes.data);
       } catch (error) {
         console.error("❌ Erreur lors du fetch des données distribution :", error);
       }
@@ -99,7 +99,7 @@ export default function Distribution() {
   }, [kpis]);
 
   useEffect(() => {
-    console.log("KPIs Distribution mis à jour :", kpis);
+    // console.log("KPIs Distribution mis à jour :", kpis);
   }, [kpis]);
 
   // Données pour le graphique en secteurs
