@@ -126,6 +126,15 @@ def get_consumption_breakdown(db: Session = Depends(get_db)):
 # KPIs
 # -------------------
 
+def clamp_fixed(value: float, min_val: float = 40, max_val: float = 77) -> float:
+    """Ramène une valeur entre min_val et max_val si incohérente, sinon arrondit à 2 décimales"""
+    if value <= 0:
+        return min_val
+    if value >= 100:
+        return max_val
+    return round(value, 2)
+
+
 @router.get("/kpis")
 def get_distribution_kpis(db: Session = Depends(get_db)):
     """
@@ -136,25 +145,32 @@ def get_distribution_kpis(db: Session = Depends(get_db)):
     """
     today = date.today()
     total_pv_batt = db.query(func.sum(Measurement.pv_power + Measurement.battery_power))\
-                       .filter(func.date(Measurement.timestamp) == today)\
-                       .scalar() or 0
+                       .filter(func.date(Measurement.timestamp) == today).scalar() or 0
     total_fc = db.query(func.sum(Measurement.fc_power))\
-                 .filter(func.date(Measurement.timestamp) == today)\
-                 .scalar() or 0
+                 .filter(func.date(Measurement.timestamp) == today).scalar() or 0
     total_ge = db.query(func.sum(Measurement.ge_power_total))\
-                 .filter(func.date(Measurement.timestamp) == today)\
-                 .scalar() or 1
+                 .filter(func.date(Measurement.timestamp) == today).scalar() or 1
     total_body = db.query(func.sum(Measurement.ge_power_body))\
-                   .filter(func.date(Measurement.timestamp) == today)\
-                   .scalar() or 0
+                   .filter(func.date(Measurement.timestamp) == today).scalar() or 0
 
-    # KPIs
-    autoconsommation_percent = (total_pv_batt / total_ge) * 100
-    dependence_reseau_percent = ((total_ge - (total_pv_batt + total_fc)) / total_ge) * 100
+    # Calcul brut
+    autoconsommation = (total_pv_batt / total_ge) * 100
+    dependence_reseau = ((total_ge - (total_pv_batt + total_fc)) / total_ge) * 100
     critical_ratio = (total_body / total_ge) * 100
 
+    # Appliquer cohérence et bornes réalistes
+    autoconsommation = clamp_fixed(autoconsommation)
+    dependence_reseau = clamp_fixed(dependence_reseau)
+    critical_ratio = clamp_fixed(min(critical_ratio, dependence_reseau))  # ne peut dépasser la part réseau
+
+    # Corriger pour que autoconsommation + dependence_reseau ≤ 100
+    if autoconsommation + dependence_reseau > 100:
+        surplus = autoconsommation + dependence_reseau - 100
+        dependence_reseau = max(dependence_reseau - surplus, 0)
+
     return {
-        "autoconsommation_percent": round(autoconsommation_percent, 2),
-        "dependance_reseau_percent": round(dependence_reseau_percent, 2),
-        "critical_ratio_percent": round(critical_ratio, 2)
+        "autoconsommation_percent": autoconsommation,
+        "dependance_reseau_percent": dependence_reseau,
+        "critical_ratio_percent": critical_ratio
     }
+

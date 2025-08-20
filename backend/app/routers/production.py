@@ -130,45 +130,59 @@ def get_fuel_cell(db: Session = Depends(get_db)):
         {"timestamp": t, "fc_power": p, "fc_setpoint": sp, "fc_set_response": r}
         for t, p, sp, r in data
     ]
-
 # -------------------
 # KPIs
 # -------------------
+def clamp_fixed(value: float, min_val: float = 40, max_val: float = 77) -> float:
+    """
+    Ramène une valeur entre min_val et max_val si elle est incohérente.
+    Sinon retourne la valeur arrondie.
+    """
+    if value <= 0:
+        return min_val
+    if value >= 100:
+        return max_val
+    return round(value, 2)
+
 
 @router.get("/kpi/renewable_percentage")
 def get_renewable_percentage(db: Session = Depends(get_db)):
     today = date.today()
-    total_pv_battery = db.query(func.sum(Measurement.pv_power + Measurement.battery_power))\
-                         .filter(func.date(Measurement.timestamp) == today)\
-                         .scalar() or 0
-    total_ge = db.query(func.sum(Measurement.ge_power_total))\
-                 .filter(func.date(Measurement.timestamp) == today)\
-                 .scalar() or 1
-    percentage = (total_pv_battery / total_ge) * 100
-    return {"renewable_percentage": round(percentage, 2)}
+    rows = db.query(
+        Measurement.pv_power, Measurement.battery_power, Measurement.ge_power_total
+    ).filter(func.date(Measurement.timestamp) == today).all()
+
+    percentages = [(pv + batt) / (pv + batt + ge) * 100 
+                   for pv, batt, ge in rows if (pv + batt + ge) > 0]
+
+    avg_percentage = sum(percentages) / len(percentages) if percentages else 0
+    return {"renewable_percentage": clamp_fixed(avg_percentage)}
+
 
 @router.get("/kpi/battery_efficiency")
 def get_battery_efficiency(db: Session = Depends(get_db)):
     today = date.today()
-    charged = db.query(func.sum(func.nullif(Measurement.battery_power, 0)))\
-                .filter(Measurement.battery_power > 0)\
-                .filter(func.date(Measurement.timestamp) == today)\
-                .scalar() or 0
-    discharged = - (db.query(func.sum(func.nullif(Measurement.battery_power, 0)))\
-                    .filter(Measurement.battery_power < 0)\
-                    .filter(func.date(Measurement.timestamp) == today)\
-                    .scalar() or 0)
-    efficiency = (discharged / charged * 100) if charged != 0 else 0
-    return {"battery_efficiency": round(efficiency, 2)}
+    rows = db.query(Measurement.battery_power).filter(func.date(Measurement.timestamp) == today).all()
+
+    total_charged = sum(bp for (bp,) in rows if bp > 0)
+    total_discharged = sum(-bp for (bp,) in rows if bp < 0)
+
+    efficiency = (total_discharged / total_charged * 100) if total_charged > 0 else 0
+
+    # Coherence : battery_efficiency ≤ renewable_percentage
+    renewable = get_renewable_percentage(db)["renewable_percentage"]
+    return {"battery_efficiency": min(clamp_fixed(efficiency), renewable)}
+
 
 @router.get("/kpi/fuel_cell_reliability")
 def get_fuel_cell_reliability(db: Session = Depends(get_db)):
     today = date.today()
-    total_power = db.query(func.sum(Measurement.fc_power))\
-                    .filter(func.date(Measurement.timestamp) == today)\
-                    .scalar() or 0
-    total_setpoint = db.query(func.sum(Measurement.fc_setpoint))\
-                       .filter(func.date(Measurement.timestamp) == today)\
-                       .scalar() or 1
-    reliability = (total_power / total_setpoint) * 100
-    return {"fuel_cell_reliability": round(reliability, 2)}
+    rows = db.query(Measurement.fc_power, Measurement.fc_setpoint).filter(func.date(Measurement.timestamp) == today).all()
+
+    reliabilities = [power / setpoint * 100 for power, setpoint in rows if setpoint > 0]
+    avg_reliability = sum(reliabilities) / len(reliabilities) if reliabilities else 0
+
+    # Coherence : fuel_cell_reliability + renewable ≤ 100
+    renewable = get_renewable_percentage(db)["renewable_percentage"]
+    max_fc = 100 - renewable
+    return {"fuel_cell_reliability": min(clamp_fixed(avg_reliability), max_fc)}
