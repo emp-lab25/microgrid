@@ -15,6 +15,7 @@ import Stockage from '../pages/Stockage';
 import Distribution from '../pages/Distribution';
 import Consommateurs from '../pages/Consommateurs';
 import MainContent from '../pages/MainContent';
+import QualiteReseau from '../pages/QualiteReseau';
 
 const Navigation = () => {
   const [isDark, setIsDark] = useState(false);
@@ -359,6 +360,7 @@ const Navigation = () => {
   {activeItem === "stockage" && <Stockage />}
   {activeItem === "distribution" && <Distribution />}
   {activeItem === "consommateur" && <Consommateurs />}
+  {activeItem === "qualite" && <QualiteReseau />}
 
 </main>
 

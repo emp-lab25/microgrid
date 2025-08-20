@@ -179,7 +179,7 @@ export default function Production() {
               stroke="var(--text-secondary)"
               fontSize={12}
               label={{
-                value: lines[0].key, // Affiche le nom de la variable
+                value: lines[0].key, 
                 angle: -90,
                 position: "insideLeft",
               }}
