@@ -734,7 +734,7 @@ const handleExportPDF = async () => {
           </div>
           <button className="export-button" onClick={handleExportPDF}>
             <Download size={18} />
-            Exporter Données
+            Exporter les graphes
           </button>
         </div>
 
@@ -950,7 +950,7 @@ const handleExportPDF = async () => {
             title="Prédictions Tension (5 jours)"
             data={predictionData}
             lines={[
-              { key: "mg_lv_voltage_pred", color: "#5a4a6b" },
+              { key: "mg_lv_voltage_pred", color: "#fc49dcff" },
             ]}
             xKey="date"
           />
