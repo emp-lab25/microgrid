@@ -67,9 +67,9 @@ export default function Distribution() {
         ]);
 
         // Logs pour inspecter la structure
-        console.log("📊 consumptionTotalRes:", consumptionTotalRes);
-        console.log("🔄 consumptionBreakdownRes:", consumptionBreakdownRes);
-        console.log("📈 kpisRes:", kpisRes);
+        // console.log("📊 consumptionTotalRes:", consumptionTotalRes);
+        // console.log("🔄 consumptionBreakdownRes:", consumptionBreakdownRes);
+        // console.log("📈 kpisRes:", kpisRes);
 
         setConsumptionTotalData(formatDataWithHour(consumptionTotalRes.data));
         setConsumptionBreakdownData(formatDataWithHour(consumptionBreakdownRes.data));
@@ -103,18 +103,23 @@ export default function Distribution() {
   }, [kpis]);
 
   // Données pour le graphique en secteurs
-  const pieData = consumptionBreakdownData.length > 0 ? [
-    {
-      name: "GE Body",
-      value: consumptionBreakdownData[consumptionBreakdownData.length - 1]?.ge_body || 0,
-      color: "#6a8e4e"
-    },
-    {
-      name: "Autres Charges",
-      value: consumptionBreakdownData[consumptionBreakdownData.length - 1]?.other_loads || 0,
-      color: "#f4a261"
-    }
-  ] : [];
+  const pieData = consumptionBreakdownData.length > 0
+  ? [
+      {
+        name: "GE Body",
+        value: Math.abs(consumptionBreakdownData[consumptionBreakdownData.length - 1]?.ge_body || 0),
+        color: "#6a8e4e",
+      },
+      {
+        name: "Autres Charges",
+        value: Math.abs(consumptionBreakdownData[consumptionBreakdownData.length - 1]?.other_loads || 0),
+        color: "#f4a261",
+      },
+    ]
+  : [
+      { name: "GE Body", value: 50, color: "#6a8e4e" },
+      { name: "Autres Charges", value: 50, color: "#f4a261" },
+    ];
 
   // Composant KPI Card
   const KpiCard = ({ title, value, unit, gradientClass, icon }) => (
@@ -159,10 +164,14 @@ export default function Distribution() {
               stroke="var(--text-secondary)" 
               fontSize={12}
             />
-            <YAxis 
-              stroke="var(--text-secondary)" 
+            <YAxis
+              stroke="var(--text-secondary)"
               fontSize={12}
-              label={{ value: "Puissance (kW)", angle: -90, position: "insideLeft" }}
+              label={{
+                value: lines[0].key, // Affiche le nom de la variable
+                angle: -90,
+                position: "insideLeft",
+              }}
             />
             <Tooltip
               contentStyle={{
@@ -193,58 +202,67 @@ export default function Distribution() {
 
   // Composant Pie Chart Card
   const PieChartCard = ({ title, data, height = 300 }) => (
-    <div className="chart-card">
-      <h3 className="chart-title">{title}</h3>
-      <p className="chart-date" style={{
+  <div className="chart-card">
+    <h3 className="chart-title">{title}</h3>
+    <p
+      className="chart-date"
+      style={{
         textAlign: "right",
         width: "100%",
         fontSize: "14px",
         color: "var(--text-secondary)",
-      }}>{todayDate}</p>
+      }}
+    >
+      {todayDate}
+    </p>
 
-      <div className="chart-container">
-        <ResponsiveContainer width="100%" height={height}>
-          <PieChart>
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={100}
-              paddingAngle={5}
-              dataKey="value"
-            >
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Pie>
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "var(--bg-secondary)",
-                border: `2px solid var(--border-color)`,
-                borderRadius: "12px",
-                color: "var(--text-primary)",
-                boxShadow: "0 8px 32px var(--shadow)",
-                fontSize: "14px",
-              }}
-              formatter={(value) => [`${value.toFixed(1)} kW`, 'Consommation']}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-        <div className="pie-legend">
-          {data.map((entry, index) => (
-            <div key={index} className="legend-item">
-              <div 
-                className="legend-color" 
-                style={{ backgroundColor: entry.color }}
-              ></div>
-              <span className="legend-text">{entry.name}</span>
-            </div>
-          ))}
-        </div>
+    <div className="chart-container">
+      <ResponsiveContainer width="100%" height={height}>
+        <PieChart>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            innerRadius={60}
+            outerRadius={100}
+            paddingAngle={5}
+            dataKey="value"
+            label={({ name, percent }) => 
+              `${name}: ${(percent * 100).toFixed(1)}%`
+            }
+            labelLine={false}
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Pie>
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "var(--bg-secondary)",
+              border: `2px solid var(--border-color)`,
+              borderRadius: "12px",
+              color: "var(--text-primary)",
+              boxShadow: "0 8px 32px var(--shadow)",
+              fontSize: "14px",
+            }}
+            formatter={(value) => [`${value.toFixed(1)} kW`, "Consommation"]}
+          />
+        </PieChart>
+      </ResponsiveContainer>
+      <div className="pie-legend">
+        {data.map((entry, index) => (
+          <div key={index} className="legend-item">
+            <div
+              className="legend-color"
+              style={{ backgroundColor: entry.color }}
+            ></div>
+            <span className="legend-text">{entry.name}</span>
+          </div>
+        ))}
       </div>
     </div>
-  );
+  </div>
+);
 
   return (
     <>
@@ -588,7 +606,7 @@ export default function Distribution() {
           <ChartCard
             title="Consommation Totale (kW)"
             data={consumptionTotalData}
-            lines={[{ key: "ge_power_total", color: "#6a8e4e" }]}
+            lines={[{ key: "ge_power_total", color: "#ff8c5fff" }]}
           />
 
           <PieChartCard
@@ -600,8 +618,8 @@ export default function Distribution() {
             title="Évolution des Charges"
             data={consumptionBreakdownData}
             lines={[
-              { key: "ge_body", color: "#6a8e4e" },
-              { key: "other_loads", color: "#f4a261" },
+              { key: "ge_body", color: "#40fcc7ff" },
+              { key: "other_loads", color: "#e148f9ff" },
             ]}
           />
 

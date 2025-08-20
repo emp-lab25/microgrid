@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Edit, Trash2, Plus, Download, MapPin, Users, AlertTriangle, CheckCircle, Search } from 'lucide-react';
+import ExportButton from "./ExportButton";
 
 // Configuration des icônes Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -473,23 +474,6 @@ export default function Consommateurs() {
     setShowModal(false);
   };
 
-  const handleExport = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/consumers/export_csv`, {
-        responseType: 'blob'
-      });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'consommateurs.csv');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (error) {
-      console.error('Erreur lors de l\'export:', error);
-    }
-  };
-
   // Filtrage des données
   const filteredConsumers = consumers.filter(consumer => {
     const matchesSearch = consumer.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -526,6 +510,44 @@ export default function Consommateurs() {
           --border-color: #e2e8f0;
           --shadow: rgba(0, 0, 0, 0.1);
         }
+
+
+.export-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.export-buttons button {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.export-buttons button:hover {
+  background: #6a8e4e;
+}
+
+.cancel-button {
+  display: flex;
+  justify-content: flex-end;
+
+
+}
+
+.cancel-button button {
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #6a8e4e;  
+font-size: 15px;
+  cursor: pointer;
+}
+
+.cancel-button button:hover {
+  background: #ed1d1dff;
+}
+
+
 
         .consumers-container {
            padding: 5%;
@@ -1191,14 +1213,16 @@ export default function Consommateurs() {
               <Plus size={20} />
               Nouveau
             </button>
-
+{/* 
             <button
               className="btn btn-secondary"
               onClick={handleExport}
             >
               <Download size={20} />
-              Export CSV
-            </button>
+              Export 
+            </button> */}
+            <ExportButton filteredConsumers={filteredConsumers} />
+
           </div>
         </div>
 

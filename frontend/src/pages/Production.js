@@ -174,11 +174,17 @@ export default function Production() {
               stroke="var(--text-secondary)" 
               fontSize={12}
             />
-            <YAxis 
-              stroke="var(--text-secondary)" 
+
+            <YAxis
+              stroke="var(--text-secondary)"
               fontSize={12}
-              label={{ value: "Valeur", angle: -90, position: "insideLeft" }}
+              label={{
+                value: lines[0].key, // Affiche le nom de la variable
+                angle: -90,
+                position: "insideLeft",
+              }}
             />
+
             <Tooltip
               contentStyle={{
                 backgroundColor: "var(--bg-secondary)",
@@ -527,14 +533,14 @@ export default function Production() {
           <ChartCard
             title="Puissance Batterie (kW)"
             data={batteryPowerData}
-            lines={[{ key: "battery_power", color: "#6a8e4e" }]}
+            lines={[{ key: "battery_power", color: "#9ff35fff" }]}
           />
 
           <ChartCard
             title="Réponse Batterie vs Consigne"
             data={batteryResponseData}
             lines={[
-              { key: "battery_power", color: "#814e8eff" },
+              { key: "battery_power", color: "#c609f6ff" },
               { key: "battery_set_response", color: "#74f1ffff" },
             ]}
           />
@@ -542,16 +548,16 @@ export default function Production() {
           <ChartCard
             title="Production Photovoltaïque (kW)"
             data={pvPowerData}
-            lines={[{ key: "pv_power", color: "#f4a261" }]}
+            lines={[{ key: "pv_power", color: "#ffa860ff" }]}
           />
 
           <ChartCard
             title="Pile à Combustible - Performance"
             data={fuelCellData}
             lines={[
-              { key: "fc_power", color: "#5a4a6b" },
-              { key: "fc_setpoint", color: "#3a2e4a" },
-              { key: "fc_set_response", color: "#8b7ba8" },
+              { key: "fc_power", color: "#f705dbff" },
+              { key: "fc_setpoint", color: "#4e02b2ff" },
+              { key: "fc_set_response", color: "#fb3671ff" },
             ]}
           />
         </div>
@@ -559,46 +565,3 @@ export default function Production() {
     </>
   );
 }
-
-// Sample data
-// const batteryPowerData = [
-//   { timestamp: "00:00", battery_power: 45 },
-//   { timestamp: "04:00", battery_power: 52 },
-//   { timestamp: "08:00", battery_power: 38 },
-//   { timestamp: "12:00", battery_power: 65 },
-//   { timestamp: "16:00", battery_power: 58 },
-//   { timestamp: "20:00", battery_power: 42 },
-// ]
-
-// const batteryResponseData = [
-//   { timestamp: "00:00", battery_power: 45, battery_set_response: 48 },
-//   { timestamp: "04:00", battery_power: 52, battery_set_response: 55 },
-//   { timestamp: "08:00", battery_power: 38, battery_set_response: 40 },
-//   { timestamp: "12:00", battery_power: 65, battery_set_response: 62 },
-//   { timestamp: "16:00", battery_power: 58, battery_set_response: 60 },
-//   { timestamp: "20:00", battery_power: 42, battery_set_response: 45 },
-// ]
-
-// const pvPowerData = [
-//   { timestamp: "00:00", pv_power: 0 },
-//   { timestamp: "04:00", pv_power: 15 },
-//   { timestamp: "08:00", pv_power: 45 },
-//   { timestamp: "12:00", pv_power: 85 },
-//   { timestamp: "16:00", pv_power: 65 },
-//   { timestamp: "20:00", pv_power: 10 },
-// ]
-
-// const fuelCellData = [
-//   { timestamp: "00:00", fc_power: 25, fc_setpoint: 30, fc_set_response: 28 },
-//   { timestamp: "04:00", fc_power: 32, fc_setpoint: 35, fc_set_response: 34 },
-//   { timestamp: "08:00", fc_power: 28, fc_setpoint: 30, fc_set_response: 29 },
-//   { timestamp: "12:00", fc_power: 40, fc_setpoint: 42, fc_set_response: 41 },
-//   { timestamp: "16:00", fc_power: 35, fc_setpoint: 38, fc_set_response: 37 },
-//   { timestamp: "20:00", fc_power: 30, fc_setpoint: 32, fc_set_response: 31 },
-// ]
-
-// const kpis = {
-//   renewable_percentage: 78.5,
-//   battery_efficiency: 94.2,
-//   fuel_cell_reliability: 98.7,
-// }

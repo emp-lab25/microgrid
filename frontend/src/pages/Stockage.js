@@ -150,10 +150,14 @@ export default function Stockage() {
               stroke="var(--text-secondary)" 
               fontSize={12}
             />
-            <YAxis 
-              stroke="var(--text-secondary)" 
+            <YAxis
+              stroke="var(--text-secondary)"
               fontSize={12}
-              label={{ value: "Valeur", angle: -90, position: "insideLeft" }}
+              label={{
+                value: lines[0].key, // Affiche le nom de la variable
+                angle: -90,
+                position: "insideLeft",
+              }}
             />
             <Tooltip
               contentStyle={{
@@ -607,7 +611,7 @@ export default function Stockage() {
           <ChartCard
             title="Contribution Pile à Combustible (%)"
             data={fuelCellContributionData}
-            lines={[{ key: "fuelcell_contribution", color: "#f4a261" }]}
+            lines={[{ key: "fuelcell_contribution", color: "#fba055ff" }]}
           />
         </div>
       </div>
