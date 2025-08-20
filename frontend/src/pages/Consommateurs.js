@@ -408,29 +408,42 @@ export default function Consommateurs() {
       setLoading(false);
     }
   };
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-  // Gestion du formulaire
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const data = {
-        ...formData,
-        latitude: parseFloat(formData.latitude),
-        longitude: parseFloat(formData.longitude)
-      };
+  try {
+    // Nettoyage des champs texte pour retirer tout code HTML/JS pour échappe les < et > pour éviter l’injection de HTML/JS.
+    const sanitizeText = (text) => {
+      if (!text) return "";
+      return text.replace(/</g, "&lt;").replace(/>/g, "&gt;").trim();
+    };
 
-      if (editingConsumer) {
-        await axios.put(`${API_URL}/consumers/${editingConsumer.id}`, data);
-      } else {
-        await axios.post(`${API_URL}/consumers/`, data);
-      }
+    const data = {
+      name: sanitizeText(formData.name),
+      type: sanitizeText(formData.type),
+      latitude: parseFloat(formData.latitude),
+      longitude: parseFloat(formData.longitude),
+    };
 
-      fetchConsumers();
-      resetForm();
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error);
+    // Vérification des valeurs numériques
+    if (isNaN(data.latitude) || isNaN(data.longitude)) {
+      alert("Latitude et longitude doivent être des nombres valides.");
+      return;
     }
-  };
+
+    if (editingConsumer) {
+      await axios.put(`${API_URL}/consumers/${editingConsumer.id}`, data);
+    } else {
+      await axios.post(`${API_URL}/consumers/`, data);
+    }
+
+    fetchConsumers();
+    resetForm();
+  } catch (error) {
+    console.error("Erreur lors de la sauvegarde:", error);
+    alert("Une erreur est survenue lors de la sauvegarde.");
+  }
+};
 
   const handleEdit = (consumer) => {
     setEditingConsumer(consumer);

@@ -5,7 +5,7 @@ class Consumer(Base):
     __tablename__ = "consumers"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    type = Column(String, nullable=False)
-    latitude = Column(Float, nullable=False)
-    longitude = Column(Float, nullable=False)
+    name = Column(String(50), nullable=False)    # longueur max 50
+    type = Column(String(20), nullable=False)    # longueur max 20
+    latitude = Column(Float, nullable=False)     # float pour latitude
+    longitude = Column(Float, nullable=False)    # float pour longitude
