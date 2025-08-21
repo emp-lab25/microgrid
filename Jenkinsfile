@@ -47,7 +47,7 @@ pipeline {
                     // Exemple : build Database
                     dir('db') {
                         sh 'ls -la'
-                        sh 'cat Dockerfile'
+                        sh 'cat dockerfile'
                         docker.build("${env.DOCKER_USERNAME}/${env.POSTGRES_IMAGE}:${env.IMAGE_TAG}", ".")
                     }
                 }
