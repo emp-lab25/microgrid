@@ -412,6 +412,7 @@ const handleSubmit = async (e) => {
   e.preventDefault();
 
   try {
+    
     // Nettoyage des champs texte pour retirer tout code HTML/JS pour échappe les < et > pour éviter l’injection de HTML/JS.
     const sanitizeText = (text) => {
       if (!text) return "";

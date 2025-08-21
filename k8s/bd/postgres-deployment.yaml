@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microgrid-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microgrid-postgres
+  template:
+    metadata:
+      labels:
+        app: microgrid-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: emp79/microgrid:latest
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: "microgrid_admin"
+            - name: POSTGRES_PASSWORD
+              value: "123"
+            - name: POSTGRES_DB
+              value: "microgrid_db"
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-storage
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc

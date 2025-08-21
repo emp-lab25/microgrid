@@ -1,0 +1,11 @@
+# Image officielle PostgreSQL
+FROM postgres:16
+
+# Variables d'environnement pour créer la base et l'utilisateur
+ENV POSTGRES_DB=microgrid_db \
+    POSTGRES_USER=microgrid_admin \
+    POSTGRES_PASSWORD=123
+
+# Copier le fichier SQL dans le dossier d'initialisation
+# ⚠️ Ce fichier sera exécuté automatiquement au premier démarrage
+COPY backup.sql /docker-entrypoint-initdb.d/01-backup.sql

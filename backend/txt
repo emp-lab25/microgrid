@@ -3,3 +3,5 @@ commande pour active env : venv\Scripts\activate
 remplire base de donnes : python app\ingest_csv.py
 lancer app : uvicorn app.main:app --reload --port 8011
 init_db : pour initialiser base donnes
+
+chargez les donnes dans base donnes dans contenaire docker : docker exec -it test-postgres psql -U microgrid_admin2 -d microgrid_db2 -f /docker-entrypoint-initdb.d/01-backup.sql

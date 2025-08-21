@@ -275,11 +275,22 @@ const handleExportPDF = async () => {
         <ResponsiveContainer width="100%" height={height}>
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" opacity={0.3} />
-            <XAxis 
-              dataKey={xKey}   // 🔥 configurable
-              stroke="var(--text-secondary)" 
-              fontSize={12}
-            />
+<XAxis
+  dataKey={xKey}
+  stroke="var(--text-secondary)"
+  fontSize={12}
+  tickFormatter={(_, index) => {
+    const baseDate = new Date();
+    baseDate.setDate(baseDate.getDate() + 1 + index); 
+
+    const day = baseDate.getDate();
+    const month = baseDate.getMonth() + 1; 
+
+    return `${day}/${month}`;
+  }}
+/>
+
+
             <YAxis
               stroke="var(--text-secondary)"
               fontSize={12}
@@ -928,9 +939,9 @@ const handleExportPDF = async () => {
             title="Tensions du Réseau (V)"
             data={voltageFrequencyData}
             lines={[
-              { key: "mg_lv_voltage", color: "#2d473e" },
-              { key: "receiving_voltage", color: "#6a8e4e" },
-              { key: "mccb_voltage", color: "#4a6b3a" },
+              { key: "mg_lv_voltage", color: "#90f74fff" },
+              { key: "receiving_voltage", color: "#eef607ff" },
+              { key: "mccb_voltage", color: "#52f7fcff" },
             ]}
           />
 
@@ -938,8 +949,8 @@ const handleExportPDF = async () => {
             title="Fréquences du Réseau (Hz)"
             data={voltageFrequencyData}
             lines={[
-              { key: "mg_lv_frequency", color: "#f4a261" },
-              { key: "mccb_frequency", color: "#e76f51" },
+              { key: "mg_lv_frequency", color: "#fd4a4aff" },
+              { key: "mccb_frequency", color: "#f3289bff" },
             ]}
           />
         </div>
@@ -950,7 +961,7 @@ const handleExportPDF = async () => {
             title="Prédictions Tension (5 jours)"
             data={predictionData}
             lines={[
-              { key: "mg_lv_voltage_pred", color: "#fc49dcff" },
+              { key: "mg_lv_voltage_pred", color: "#73fc49ff" },
             ]}
             xKey="date"
           />
