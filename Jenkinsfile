@@ -45,7 +45,7 @@ pipeline {
             steps {
                 script {
                     // Exemple : build Database
-                    dir('microgrid/db') {
+                    dir('db/') {
                         sh 'ls -la'
                         sh 'cat dockerfile'
                         docker.build("${env.DOCKER_USERNAME}/${env.POSTGRES_IMAGE}:${env.IMAGE_TAG}", ".")
@@ -73,7 +73,7 @@ pipeline {
                     "PATH+KUBECTL=/usr/local/bin",
                     "KUBECONFIG=/home/jenkins/.kube/config"
                 ]) {
-                    dir('microgrid/k8s/bd') {
+                    dir('k8s/bd/') {
                         sh """
                             kubectl apply -f postgres-pvc.yaml
                             kubectl apply -f postgres-deployment.yaml
