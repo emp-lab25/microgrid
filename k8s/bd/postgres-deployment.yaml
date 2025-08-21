@@ -26,8 +26,8 @@ spec:
               value: "microgrid_db"
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
-              name: postgres-storage
+              name: postgres2-storage
       volumes:
-        - name: postgres-storage
+        - name: postgres2-storage
           persistentVolumeClaim:
-            claimName: postgres-pvc
+            claimName: postgres2-pvc
