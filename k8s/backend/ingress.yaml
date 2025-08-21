@@ -1,0 +1,23 @@
+
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: microgrid-ingress
+  namespace: default
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: microgrid.evplan.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+                    service:
+                      name: microgrid-backend-service
+                      port:
+                        number: 80

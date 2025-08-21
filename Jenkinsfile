@@ -44,10 +44,16 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 script {
-                    dir('db/') {
+                    // dir('db/') {
+                    //     sh 'ls -la'
+                    //     sh 'cat dockerfile'
+                    //     docker.build("${env.DOCKER_USERNAME}/${env.POSTGRES_IMAGE}:${env.IMAGE_TAG}", ".")
+                    // }
+                    
+                    dir('backend/') {
                         sh 'ls -la'
-                        sh 'cat dockerfile'
-                        docker.build("${env.DOCKER_USERNAME}/${env.POSTGRES_IMAGE}:${env.IMAGE_TAG}", ".")
+                        sh 'cat Dockerfile'
+                        docker.build("${env.DOCKER_USERNAME}/${env.BACKEND_IMAGE}:${env.IMAGE_TAG}", ".")
                     }
                 }
             }
@@ -60,28 +66,51 @@ pipeline {
                         echo "✅ Connexion réussie au Docker Registry"
 
                         // Push Database
-                        docker.image("${env.DOCKER_USERNAME}/${env.POSTGRES_IMAGE}:${env.IMAGE_TAG}").push('latest')
+                        // docker.image("${env.DOCKER_USERNAME}/${env.POSTGRES_IMAGE}:${env.IMAGE_TAG}").push('latest')
+
+                        // Push Backend
+                        docker.image("${env.DOCKER_USERNAME}/${env.BACKEND_IMAGE}:${env.IMAGE_TAG}").push('latest')
                     }
                 }
             }
         }
 
-        stage('Déploiement Kubernetes de la base de données') {
+        // stage('Déploiement Kubernetes de la base de données') {
+        //     steps {
+        //         withEnv([
+        //             "PATH+KUBECTL=/usr/local/bin",
+        //             "KUBECONFIG=/home/jenkins/.kube/config"
+        //         ]) {
+        //             dir('k8s/bd/') {
+        //                 sh """
+        //                     kubectl apply -f postgres-pvc.yaml
+        //                     kubectl apply -f postgres-deployment.yaml
+        //                     kubectl apply -f postgres-service.yaml
+        //                 """
+        //             }
+        //         }
+        //     }
+        // }
+
+        stage('Déploiement Kubernetes de backend') {
             steps {
                 withEnv([
                     "PATH+KUBECTL=/usr/local/bin",
                     "KUBECONFIG=/home/jenkins/.kube/config"
                 ]) {
-                    dir('k8s/bd/') {
+                    dir('k8s/backend/') {
                         sh """
-                            kubectl apply -f postgres-pvc.yaml
-                            kubectl apply -f postgres-deployment.yaml
-                            kubectl apply -f postgres-service.yaml
+                            kubectl apply -f deployment.yaml
+                            kubectl apply -f service.yaml
+                            kubectl apply -f ingress.yaml
+
                         """
                     }
                 }
             }
         }
+
+
     }
 
     post {

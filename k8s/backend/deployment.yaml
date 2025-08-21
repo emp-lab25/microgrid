@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microgrid-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microgrid-backend
+  template:
+    metadata:
+      labels:
+        app: microgrid-backend
+    spec:
+      containers:
+        - name: microgrid-backend
+          image: emp79/microgrid-backend:latest
+          ports:
+            - containerPort: 8011
+          env:
+            - name: DB_USER
+              value: "microgrid_admin"
+            - name: DB_PASSWORD
+              value: "123"
+            - name: DB_HOST
+              value: "microgrid-postgres"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_DATABASE
+              value: "microgrid_db"
