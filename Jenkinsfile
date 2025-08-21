@@ -41,18 +41,29 @@ pipeline {
             }
         }
 
-        stage('Build Docker Images') {
-            steps {
-                script {
-                    // Exemple : build Database
-                    dir('db/') {
-                        sh 'ls -la'
-                        sh 'cat dockerfile'
-                        docker.build("${env.DOCKER_USERNAME}/${env.POSTGRES_IMAGE}:${env.IMAGE_TAG}", ".")
-                    }
-                }
+  stage('Build Docker Images') {
+    steps {
+        script {
+            // Lister le contenu du workspace avant d'entrer dans db
+            sh '''
+                echo "📂 Contenu du workspace actuel :"
+                ls -la
+            '''
+
+            dir('db') {
+                sh '''
+                    echo "📂 Contenu du dossier db :"
+                    ls -la
+                '''
+
+                sh 'cat Dockerfile'
+
+                docker.build("${env.DOCKER_USERNAME}/${env.POSTGRES_IMAGE}:${env.IMAGE_TAG}", ".")
             }
         }
+    }
+}
+
 
         stage('Push Docker Images') {
             steps {
