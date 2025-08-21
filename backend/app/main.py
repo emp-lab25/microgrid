@@ -58,8 +58,9 @@ def test_db_connection():
         print("Connexion réussie à la base de données PostgreSQL!")
     except Exception as e:
         print(f"Erreur de connexion à la base de données : {e}")
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8011)
+
     print("---------------------------------------------------------------------------------------------")
     test_db_connection()
     print("---------------------------------------------------------------------------------------------")
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8011)
