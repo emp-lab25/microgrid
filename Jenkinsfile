@@ -21,7 +21,7 @@ pipeline {
             steps {
                 sh 'git config --global http.postBuffer 524288000'
                 git credentialsId: "${env.GIT_CREDENTIALS}",
-                    url: 'https://github.com/emp-lab25/evplan.git',
+                    url: 'https://github.com/emp-lab25/microgrid.git',
                     branch: 'main'
             }
         }
@@ -41,29 +41,17 @@ pipeline {
             }
         }
 
-  stage('Build Docker Images') {
-    steps {
-        script {
-            // Lister le contenu du workspace avant d'entrer dans db
-            sh '''
-                echo "📂 Contenu du workspace actuel :"
-                ls -la
-            '''
-
-            dir('db') {
-                sh '''
-                    echo "📂 Contenu du dossier db :"
-                    ls -la
-                '''
-
-                sh 'cat Dockerfile'
-
-                docker.build("${env.DOCKER_USERNAME}/${env.POSTGRES_IMAGE}:${env.IMAGE_TAG}", ".")
+        stage('Build Docker Images') {
+            steps {
+                script {
+                    dir('db/') {
+                        sh 'ls -la'
+                        sh 'cat dockerfile'
+                        docker.build("${env.DOCKER_USERNAME}/${env.POSTGRES_IMAGE}:${env.IMAGE_TAG}", ".")
+                    }
+                }
             }
         }
-    }
-}
-
 
         stage('Push Docker Images') {
             steps {
