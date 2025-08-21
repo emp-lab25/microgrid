@@ -17,11 +17,15 @@ Mini-application de monitoring énergétique d’un microgrid. Cette application
 
 ##  Stack Technique
 
+
 - **Backend** : FastAPI  
 - **Frontend** : React  
 - **Base de données** : PostgreSQL  
 - **Machine Learning** : Random Forest (fichier `random_forest_model.pkl`)  
-- **Déploiement** : Kubernetes  
+- **Déploiement** :  
+  - **Backend** : déployé sur **Kubernetes**, exposé à Internet via **Cloudflare Tunnel**  
+  - **Frontend** : déployé sur **Netlify**  
+
 
 ---
 
@@ -89,7 +93,7 @@ Les données sont récupérées depuis Kaggle et corrigées localement pour évi
 - **Fonctionnalités avancées** : 
   - **Simulation dynamique** : ajustement consommation, production PV/PAC, mode îlot
   - **Prédictions ML** : affichage des résultats d’un modèle pré-entraîné (`.pkl`)
-  - **Export des données** : possibilité d’exporter les mesures, prédictions et résultats de simulation au format **JSON** et les graphes sous forme de **PDF**
+  - **Export des données** : possibilité d’exporter les graphes sous forme de **PDF**
 
 
 ---
@@ -135,31 +139,65 @@ npm start
 
 ---
 
-##  Sécurité & Déploiement
+#  Sécurité & 🚀 Déploiement
 
-- L’application est conteneurisée et déployée sur **Kubernetes** pour scalabilité et haute disponibilité.
-- Les endpoints sont sécurisés et seules les données valides sont traitées.
+## Déploiement
+- **Backend** : entièrement **conteneurisé avec Docker**, déployé sur **Kubernetes** pour une **scalabilité** et une **haute disponibilité**, exposé de manière sécurisée via **Cloudflare Tunnel**.  
+- **Frontend** : hébergé sur **Netlify**, offrant une distribution rapide et fiable des assets statiques.  
+- **Base de données** : PostgreSQL **conteneurisée sur Kubernetes**, non exposée à l’extérieur, accessible uniquement par le backend pour assurer la sécurité des données.  
+- **Avantages** : architecture moderne, isolation complète des composants, résilience aux pannes et gestion simplifiée des mises à jour.  
+
+## Sécurité des données
+- **Validation stricte** de chaque champ en entrée pour prévenir les **injections malveillantes** et garantir l’intégrité des données.  
+- **Restrictions et contrôles** appliqués dans le backend pour assurer le respect des formats et des contraintes métier.  
+- **Endpoints sécurisés** : seuls les accès avec données valides sont traités, renforçant la protection contre les attaques.  
+- **Conteneurisation et orchestration** apportent une couche supplémentaire de sécurité et d’isolation des services.  
+
 
 ---
 
 ##  Organisation du projet
 
 ```
-microgrid-monitoring/
+microgrid/
 │
-├─ backend/                 
-│  ├─ app/
-│  │  ├─ main.py
-│  │  ├─ ingest_csv.py
-│  │  ├─ models/
-│  │  ├─ routers/
-│  │  ├─ database.py
-│  │  └─ network_quality.py
-│  └─ ml/
-│     └─ random_forest_model.pkl
-│  └─ data/
+├─ backend/ 
+│ ├─ app/
+│ │ ├─ pycache/ # Fichiers compilés Python
+│ │ ├─ models/ # Définition des modèles 
+│ │ ├─ routers/ # Endpoints FastAPI
+│ │ ├─ init.py
+│ │ ├─ database.py # Configuration et connexion à PostgreSQL
+│ │ ├─ ingest_csv.py # Script pour charger les données CSV dans la DB
+│ │ └─ main.py # Point d'entrée de l'application FastAPI
+│ │
+│ ├─ data/ # Données CSV d'entrée
+│ ├─ ml/
+│ │ ├─ predict.ipynb # Notebook pour prédictions et tests ML
+│ │ └─ random_forest_model.pkl # Modèle ML pré-entraîné
+│ │
+│ ├─ venv/ 
+│ ├─ Dockerfile 
+│ └─ requirements.txt # Dépendances Python
 │
-├─ frontend/                
-├─ k8s/                   
-└─ README.md
+├─ db/ 
+│ ├─ backup.sql # Fichier de sauvegarde initial de la DB
+│ └─ dockerfile # Dockerfile pour containeriser la DB
+│
+├─ frontend/ # Frontend React
+│
+├─ k8s/ 
+│ ├─ backend/ 
+│ │ ├─ deployment.yaml # Deployment Kubernetes du backend
+│ │ ├─ ingress.yaml # Ingress pour exposer le backend via Cloudflare
+│ │ └─ service.yaml # Service Kubernetes pour le backend
+│ │
+│ ├─ bd/ 
+│ │ ├─ postgres-deployment.yaml # Deployment Kubernetes de PostgreSQL
+│ │ ├─ postgres-pvc.yaml # Persistent Volume Claim
+│ │ └─ postgres-service.yaml # Service interne pour le backend uniquement
+│
+├─ .gitignore 
+├─ Jenkinsfile # Pipeline CI/CD
+└─ README.md 
 ```
