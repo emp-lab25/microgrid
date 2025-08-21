@@ -41,5 +41,25 @@ app.include_router(distribution.router)
 app.include_router(consumers.router)
 app.include_router(network_quality.router)
 
+#tester DB
+# DATABASE_URL = "postgresql+psycopg2://microgrid_admin:123@localhost/microgrid_db"
+DATABASE_URL ="postgresql://microgrid_admin:123@microgrid-postgres:5432/microgrid_db" #in prod
+
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, text
+
+def test_db_connection():
+    engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+    try:
+        with engine.connect() as connection:
+            result = connection.execute(text("SELECT 1"))
+            print(f"Test query result: {result.scalar()}")
+        print("Connexion réussie à la base de données PostgreSQL!")
+    except Exception as e:
+        print(f"Erreur de connexion à la base de données : {e}")
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8011)
+    print("---------------------------------------------------------------------------------------------")
+    test_db_connection()
+    print("---------------------------------------------------------------------------------------------")
