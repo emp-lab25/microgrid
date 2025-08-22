@@ -70,7 +70,7 @@ Les données sont récupérées depuis Kaggle et corrigées localement pour évi
 
 ### 3️⃣ Distribution & Consommation
 - **Champs utilisés** : `ge_power_total`, `ge_power_body`, `mccb_power`
-- **Graphiques** : Donut chart, évolution consommation
+- **Graphiques** : Répartition de la Consommation (Donut chart), evolution des Charges
 - **KPIs** : Part autoconsommation, dépendance au réseau, consommation critique
 
 ### 4️⃣ Gestion des consommateurs (CRUD + Carte)
@@ -83,16 +83,16 @@ Les données sont récupérées depuis Kaggle et corrigées localement pour évi
 ### 5️⃣ Qualité du réseau & Machine Learning
 - **Champs utilisés** : `mg_lv_voltage`, `receiving_voltage`, `mccb_voltage`, `mg_lv_frequency`, `mccb_frequency`
 - **Graphiques** : 
-  - Tension et fréquence du réseau (LineChart)
+  - Tension et fréquence du réseau 
   - Simulation tension/fréquence 24h (LineChart interactif)
-  - Prédictions de tension sur 5 jours (LineChart ML)
+  - Prédictions de tension sur 5 jours 
 - **KPIs** : 
   - Tension moyenne du microgrid
   - Fréquence moyenne du microgrid
   - Écart maximum de tension (MCCB ↔ bus)
 - **Fonctionnalités avancées** : 
   - **Simulation dynamique** : ajustement consommation, production PV/PAC, mode îlot
-  - **Prédictions ML** : affichage des résultats d’un modèle pré-entraîné (`.pkl`)
+  - **Prédictions ML** : affichage des résultats d’un modèle pré-entraîné (`.pkl`) pour les prédictions de tension
   - **Export des données** : possibilité d’exporter les graphes sous forme de **PDF**
 
 
@@ -134,12 +134,19 @@ npm start
 ##  Machine Learning
 
 - Le fichier `random_forest_model.pkl` contient le modèle entraîné.
-- Les prédictions utilisent les moyennes journalières des features historiques.
+- Deux modèles ont été testés : **Random Forest** et **XGBoost**.
+- Le modèle avec la **précision la plus élevée** a été retenu pour la prédiction.
+- **Grid Search** et **K-Fold Cross Validation** ont été appliqués pour :
+  - Optimiser les hyperparamètres du modèle.
+  - Améliorer la qualité des prédictions.
+  - Éviter le surapprentissage (*overfitting*).
+- Les prédictions sont basées sur les **moyennes journalières** des features historiques.
+- Le modèle final permet de prévoir les **valeurs de tension pour les 5 prochains jours**.
 - L’endpoint `/predict` retourne les valeurs prévues pour les 5 prochains jours.
 
 ---
 
-#  Sécurité & 🚀 Déploiement
+#  Sécurité & Déploiement
 
 ## Déploiement
 - **Backend** : entièrement **conteneurisé avec Docker**, déployé sur **Kubernetes** pour une **scalabilité** et une **haute disponibilité**, exposé de manière sécurisée via **Cloudflare Tunnel**.  
@@ -163,7 +170,7 @@ microgrid/
 │
 ├─ backend/ 
 │ ├─ app/
-│ │ ├─ pycache/ # Fichiers compilés Python
+│ │ ├─ pycache/ 
 │ │ ├─ models/ # Définition des modèles 
 │ │ ├─ routers/ # Endpoints FastAPI
 │ │ ├─ init.py
