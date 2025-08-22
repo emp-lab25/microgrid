@@ -22,14 +22,20 @@ export default function Stockage() {
   });
 
   // Garder que l'heure
-  const formatDataWithHour = (data) =>
-    data.map((d) => ({
+const formatDataWithHour = (data) => {
+  const now = new Date(); 
+
+  return data
+    .map((d) => ({
       ...d,
+      dateObj: new Date(d.timestamp), 
       timestamp: new Date(d.timestamp).toLocaleTimeString("fr-FR", {
         hour: "2-digit",
         minute: "2-digit",
       }),
-    }));
+    }))
+    .filter((d) => d.dateObj <= now);
+};
 
   const [batterySocData, setBatterySocData] = useState([]);
   const [fuelCellContributionData, setFuelCellContributionData] = useState([]);
@@ -150,15 +156,17 @@ export default function Stockage() {
               stroke="var(--text-secondary)" 
               fontSize={12}
             />
-            <YAxis
-              stroke="var(--text-secondary)"
-              fontSize={12}
-              label={{
-                value: lines[0].key, // Affiche le nom de la variable
-                angle: -90,
-                position: "insideLeft",
-              }}
-            />
+          <YAxis
+  stroke="var(--text-secondary)"
+  fontSize={12}
+  label={{
+    value: lines[0].key,
+    angle: -90,
+    position: "insideLeft",
+    dy: 50,   // décale vers le bas
+  }}
+/>
+
             <Tooltip
               contentStyle={{
                 backgroundColor: "var(--bg-secondary)",

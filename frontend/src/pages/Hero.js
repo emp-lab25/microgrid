@@ -65,11 +65,11 @@ const Hero = () => {
 
       <div className="hero-card">
         <div className="ai-badge2">
-          <Zap size={16} /> Suivi en temps
+          <Zap size={16} /> Suivi en temps réel
         </div>
         <h1 className="hero-title">Microgrid Monitoring</h1>
         <p className="hero-subtitle">
-          Surveillez en temps la production, le stockage et la distribution
+          Surveillez en temps réel la production, le stockage et la distribution
           d’énergie de votre système Microgrid.
         </p>
       </div>

@@ -22,14 +22,20 @@ export default function Production() {
   });
 
   //   garder que l'heure
-  const formatDataWithHour = (data) =>
-    data.map((d) => ({
+const formatDataWithHour = (data) => {
+  const now = new Date(); 
+
+  return data
+    .map((d) => ({
       ...d,
+      dateObj: new Date(d.timestamp), 
       timestamp: new Date(d.timestamp).toLocaleTimeString("fr-FR", {
         hour: "2-digit",
         minute: "2-digit",
       }),
-    }));
+    }))
+    .filter((d) => d.dateObj <= now);
+};
   // console.log(" API_URL utilisée:", API_URL);
 
   const [batteryPowerData, setBatteryPowerData] = useState([]);
@@ -169,6 +175,7 @@ export default function Production() {
         <ResponsiveContainer width="100%" height={height}>
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" opacity={0.3} />
+            
             <XAxis 
               dataKey="timestamp" 
               stroke="var(--text-secondary)" 

@@ -451,7 +451,7 @@ const MainContent = () => {
         }
       `}</style>
 
-      <div className="main-container" style={{ marginTop: "2%" }}>
+      <div className="main-container" style={{ marginTop: "2%" ,marginLeft:"5%" }}>
             <Hero />
 
         {/* Section Hero */}

@@ -53,9 +53,10 @@ const Navigation = () => {
   const handleLogoClick = () => {
     setActiveItem(null);
     if (isSidebarOpen) {
-      setIsSidebarOpen(false); // en mobile, on peut aussi refermer le menu
+      setIsSidebarOpen(false);
     }
   };
+
   return (
     <>
       {/* Styles CSS intégrés */}
@@ -69,6 +70,9 @@ const Navigation = () => {
           --hover-bg: rgba(106, 142, 78, 0.1);
           --logo-bg: #f4efe9;
           --shadow: rgba(0, 0, 0, 0.1);
+          --theme-button-bg: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+          --theme-button-shadow: 0 8px 32px rgba(45, 71, 62, 0.15);
+          --theme-button-hover-shadow: 0 12px 40px rgba(45, 71, 62, 0.25);
         }
 
         .dark-theme {
@@ -80,6 +84,9 @@ const Navigation = () => {
           --hover-bg: rgba(244, 239, 233, 0.1);
           --logo-bg: #2d473e;
           --shadow: rgba(0, 0, 0, 0.3);
+          --theme-button-bg: linear-gradient(135deg, #2d473e 0%, #1a2e23 100%);
+          --theme-button-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+          --theme-button-hover-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
         }
 
         * {
@@ -92,53 +99,68 @@ const Navigation = () => {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
           background-color: var(--bg-secondary);
           color: var(--text-primary);
-          transition: all 0.3s ease;
-        }
-
-        .navbar {
-          position: fixed;
-          top: 0;
-          // left: 243px;
-          left: 19%;
-          right: 0;
-          // height: 70px;
-          height: 15%;
-
-          background-color: var(--bg-primary);
-          border-bottom: 1px solid var(--border-color);
-          display: flex;
-          align-items: center;
-          justify-content: flex-end;
-          padding: 0 20px;
-          z-index: 1000;
-          box-shadow: 0 2px 10px var(--shadow);
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .theme-toggle {
-          width: 45px;
-          height: 45px;
+          position: fixed;
+          top: 24px;
+          right: 24px;
+          width: 60px;
+          height: 60px;
           border: none;
           border-radius: 50%;
-          background-color: var(--bg-secondary);
+          background: var(--theme-button-bg);
           color: var(--text-secondary);
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 2px 8px var(--shadow);
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: var(--theme-button-shadow);
+          z-index: 1000;
+          backdrop-filter: blur(20px);
+          border: 1px solid var(--border-color);
         }
 
         .theme-toggle:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px var(--shadow);
+          transform: translateY(-3px) scale(1.05);
+          box-shadow: var(--theme-button-hover-shadow);
+        }
+
+        .theme-toggle:active {
+          transform: translateY(-1px) scale(0.98);
+          transition: all 0.1s ease;
+        }
+
+        .theme-toggle::before {
+          content: '';
+          position: absolute;
+          inset: -2px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, var(--text-secondary), var(--text-primary));
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          z-index: -1;
+        }
+
+        .theme-toggle:hover::before {
+          opacity: 0.1;
+        }
+
+        .theme-icon {
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .theme-toggle:hover .theme-icon {
+          transform: rotate(360deg) scale(1.1);
+          filter: drop-shadow(0 2px 8px rgba(106, 142, 78, 0.3));
         }
 
         .sidebar {
           position: fixed;
           top: 0px;
           left: 0;
-          // width: 250px;
           width: 19%;
           height: 100vh;
           background-color: var(--bg-primary);
@@ -146,6 +168,7 @@ const Navigation = () => {
           z-index: 999;
           overflow-y: auto;
           box-shadow: 2px 0 10px var(--shadow);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .sidebar-header {
@@ -159,7 +182,6 @@ const Navigation = () => {
         .logo-image {
           width: 100%;
           height: 100%;
-          // border-radius: 8px;
           transition: all 0.3s ease;
         }
 
@@ -184,21 +206,17 @@ const Navigation = () => {
         }
 
         .menu-list {
-          // padding: 30px 0;
           padding: 7% 0;
-
         }
 
         .menu-item {
           display: flex;
           align-items: center;
-          // gap: 15px;
           gap: 8%;
-          // padding: 15px 20px;
           padding: 8% 10%;
           color: var(--text-primary);
           text-decoration: none;
-          transition: all 0.3s ease;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           cursor: pointer;
           border-left: 3px solid transparent;
           margin: 2px 0;
@@ -208,6 +226,7 @@ const Navigation = () => {
           background-color: var(--hover-bg);
           border-left-color: var(--text-secondary);
           padding-left: 25px;
+          transform: translateX(5px);
         }
 
         .menu-item.active {
@@ -232,25 +251,29 @@ const Navigation = () => {
         }
 
         .main-content {
-          margin-top: 70px;
-          margin-left: 280px;
+          margin-left: 19%;
           padding: 30px;
-          min-height: calc(100vh - 70px);
+          min-height: 100vh;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         @media (max-width: 768px) {
-          .navbar {
-            left: 0;
+          .theme-toggle {
+            top: 16px;
+            right: 16px;
+            width: 50px;
+            height: 50px;
           }
           
           .sidebar {
             left: ${isSidebarOpen ? '0' : '-280px'};
-            transition: left 0.3s ease;
+            width: 280px;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           }
           
           .main-content {
             margin-left: ${isSidebarOpen ? '280px' : '0'};
-            transition: margin-left 0.3s ease;
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           }
         }
 
@@ -259,17 +282,25 @@ const Navigation = () => {
           position: fixed;
           top: 15px;
           left: 15px;
-          width: 40px;
-          height: 40px;
+          width: 50px;
+          height: 50px;
           border: none;
-          border-radius: 8px;
-          background-color: var(--bg-primary);
+          border-radius: 12px;
+          background: var(--theme-button-bg);
           color: var(--text-secondary);
           align-items: center;
           justify-content: center;
           cursor: pointer;
           z-index: 1001;
-          box-shadow: 0 2px 8px var(--shadow);
+          box-shadow: var(--theme-button-shadow);
+          backdrop-filter: blur(20px);
+          border: 1px solid var(--border-color);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mobile-menu-toggle:hover {
+          transform: translateY(-2px) scale(1.05);
+          box-shadow: var(--theme-button-hover-shadow);
         }
 
         @media (max-width: 768px) {
@@ -288,7 +319,7 @@ const Navigation = () => {
           z-index: 998;
           opacity: ${isSidebarOpen ? '1' : '0'};
           visibility: ${isSidebarOpen ? 'visible' : 'hidden'};
-          transition: all 0.3s ease;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           display: none;
         }
 
@@ -303,17 +334,29 @@ const Navigation = () => {
           to { opacity: 1; transform: translateY(0); }
         }
 
+        @keyframes pulseGlow {
+          0%, 100% { 
+            box-shadow: var(--theme-button-shadow); 
+          }
+          50% { 
+            box-shadow: var(--theme-button-hover-shadow); 
+          }
+        }
+
+        .theme-toggle:focus {
+          outline: none;
+          animation: pulseGlow 2s infinite;
+        }
+
         .menu-item {
           animation: fadeIn 0.3s ease forwards;
         }
       `}</style>
 
-      {/* Navbar */}
-      <nav className="navbar">
-        <button className="theme-toggle" onClick={toggleTheme}>
-          {isDark ? <Sun size={20} /> : <Moon size={20} />}
-        </button>
-      </nav>
+      {/* Bouton de thème flottant */}
+      <button className="theme-toggle" onClick={toggleTheme} title={isDark ? 'Mode clair' : 'Mode sombre'}>
+        {isDark ? <Sun size={24} className="theme-icon" /> : <Moon size={24} className="theme-icon" />}
+      </button>
 
       {/* Bouton menu mobile */}
       <button className="mobile-menu-toggle" onClick={toggleSidebar}>
@@ -331,7 +374,6 @@ const Navigation = () => {
             alt="Logo" 
             className="logo-image"
           />
-
         </div>
         
         <div className="menu-list">
@@ -352,18 +394,14 @@ const Navigation = () => {
         </div>
       </aside>
 
-
-
       <main className="main-content">
-    {activeItem === null && <MainContent />}
-  {activeItem === "production" && <Production />}
-  {activeItem === "stockage" && <Stockage />}
-  {activeItem === "distribution" && <Distribution />}
-  {activeItem === "consommateur" && <Consommateurs />}
-  {activeItem === "qualite" && <QualiteReseau />}
-
-</main>
-
+        {activeItem === null && <MainContent />}
+        {activeItem === "production" && <Production />}
+        {activeItem === "stockage" && <Stockage />}
+        {activeItem === "distribution" && <Distribution />}
+        {activeItem === "consommateur" && <Consommateurs />}
+        {activeItem === "qualite" && <QualiteReseau />}
+      </main>
     </>
   );
 };

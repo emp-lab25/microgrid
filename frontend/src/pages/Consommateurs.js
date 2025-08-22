@@ -408,43 +408,44 @@ export default function Consommateurs() {
       setLoading(false);
     }
   };
-const handleSubmit = async (e) => {
-  e.preventDefault();
 
-  try {
-    
-    // Nettoyage des champs texte pour retirer tout code HTML/JS pour échappe les < et > pour éviter l’injection de HTML/JS.
-    const sanitizeText = (text) => {
-      if (!text) return "";
-      return text.replace(/</g, "&lt;").replace(/>/g, "&gt;").trim();
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    const data = {
-      name: sanitizeText(formData.name),
-      type: sanitizeText(formData.type),
-      latitude: parseFloat(formData.latitude),
-      longitude: parseFloat(formData.longitude),
-    };
+    try {
+      
+      // Nettoyage des champs texte pour retirer tout code HTML/JS pour échappe les < et > pour éviter l'injection de HTML/JS.
+      const sanitizeText = (text) => {
+        if (!text) return "";
+        return text.replace(/</g, "&lt;").replace(/>/g, "&gt;").trim();
+      };
 
-    // Vérification des valeurs numériques
-    if (isNaN(data.latitude) || isNaN(data.longitude)) {
-      alert("Latitude et longitude doivent être des nombres valides.");
-      return;
+      const data = {
+        name: sanitizeText(formData.name),
+        type: sanitizeText(formData.type),
+        latitude: parseFloat(formData.latitude),
+        longitude: parseFloat(formData.longitude),
+      };
+
+      // Vérification des valeurs numériques
+      if (isNaN(data.latitude) || isNaN(data.longitude)) {
+        alert("Latitude et longitude doivent être des nombres valides.");
+        return;
+      }
+
+      if (editingConsumer) {
+        await axios.put(`${API_URL}/consumers/${editingConsumer.id}`, data);
+      } else {
+        await axios.post(`${API_URL}/consumers/`, data);
+      }
+
+      fetchConsumers();
+      resetForm();
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde:", error);
+      alert("Une erreur est survenue lors de la sauvegarde.");
     }
-
-    if (editingConsumer) {
-      await axios.put(`${API_URL}/consumers/${editingConsumer.id}`, data);
-    } else {
-      await axios.post(`${API_URL}/consumers/`, data);
-    }
-
-    fetchConsumers();
-    resetForm();
-  } catch (error) {
-    console.error("Erreur lors de la sauvegarde:", error);
-    alert("Une erreur est survenue lors de la sauvegarde.");
-  }
-};
+  };
 
   const handleEdit = (consumer) => {
     setEditingConsumer(consumer);
@@ -523,9 +524,10 @@ const handleSubmit = async (e) => {
           --text-secondary: #718096;
           --border-color: #e2e8f0;
           --shadow: rgba(0, 0, 0, 0.1);
+          --gradient-primary: linear-gradient(135deg, #6a8e4e, #4a6b3a);
+          --gradient-critical: linear-gradient(135deg, #ff6b6b, #ee5a24);
+          --gradient-success: linear-gradient(135deg, #27ae60, #2ecc71);
         }
-
-
 .export-buttons {
   display: flex;
   gap: 5px;
@@ -541,43 +543,22 @@ const handleSubmit = async (e) => {
 .export-buttons button:hover {
   background: #6a8e4e;
 }
-
-.cancel-button {
-  display: flex;
-  justify-content: flex-end;
-
-
-}
-
-.cancel-button button {
-  padding: 8px 12px;
-  border-radius: 6px;
-  background: #6a8e4e;  
-font-size: 15px;
-  cursor: pointer;
-}
-
-.cancel-button button:hover {
-  background: #ed1d1dff;
-}
-
-
-
         .consumers-container {
-           padding: 5%;
-           padding-left: 8%;
-         background-color: var(--bg-secondary);
+          padding: 5%;
+          padding-left: 8%;
+          background-color: var(--bg-secondary);
           min-height: 100vh;
           color: var(--text-primary);
         }
 
-        .consumers-header {
+        /* Header Section */
+        .distribution-header {
           margin-bottom: 40px;
           animation: fadeInUp 0.6s ease-out;
         }
 
-        .consumers-title {
-            font-size: 32px;
+        .distribution-title {
+          font-size: 32px;
           font-weight: 700;
           color: var(--text-primary);
           margin-bottom: 8px;
@@ -587,35 +568,33 @@ font-size: 15px;
           -webkit-text-fill-color: transparent;
         }
 
-        .consumers-subtitle {
-          font-size: 18px;
+        .distribution-subtitle {
+          font-size: 16px;
           color: var(--text-secondary);
           font-weight: 400;
         }
 
-        /* Stats Cards */
+        /* Stats Section */
+        .stats-section {
+          margin-bottom: 3rem;
+          animation: fadeInUp 0.8s ease-out;
+        }
+
         .stats-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: 25px;
-          margin-bottom: 40px;
+          gap: 2rem;
         }
 
         .stat-card {
           background: var(--bg-primary);
-          border-radius: 20px;
-          padding: 30px;
+          border-radius: 24px;
+          padding: 2rem;
           box-shadow: 0 10px 40px var(--shadow);
           border: 1px solid var(--border-color);
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          animation: fadeInUp 0.6s ease-out;
           position: relative;
           overflow: hidden;
-        }
-
-        .stat-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
         }
 
         .stat-card::before {
@@ -624,77 +603,89 @@ font-size: 15px;
           top: 0;
           left: 0;
           right: 0;
-          height: 4px;
-          background: linear-gradient(90deg, var(--text-secondary), #6a8e4e);
+          height: 5px;
+        }
+
+        .stat-card:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card.total::before {
+          background: var(--gradient-primary);
         }
 
         .stat-card.critical::before {
-          background: linear-gradient(90deg, #ff6b6b, #ee5a24);
+          background: var(--gradient-critical);
         }
 
         .stat-card.non-critical::before {
-          background: linear-gradient(90deg, #6a8e4e, #4a6b3a);
+          background: var(--gradient-success);
         }
 
         .stat-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 15px;
         }
 
         .stat-icon {
-          width: 60px;
-          height: 60px;
-          border-radius: 16px;
+          width: 70px;
+          height: 70px;
+          border-radius: 20px;
           display: flex;
           align-items: center;
           justify-content: center;
           color: white;
-          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
         .stat-icon.total {
-          background: linear-gradient(135deg, #2d473e, #1a2e23);
+          background: var(--gradient-primary);
         }
 
         .stat-icon.critical {
-          background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+          background: var(--gradient-critical);
         }
 
         .stat-icon.non-critical {
-          background: linear-gradient(135deg, #6a8e4e, #4a6b3a);
+          background: var(--gradient-success);
         }
 
-        .stat-value {
-          font-size: 32px;
-          font-weight: 800;
-          color: var(--text-primary);
+        .stat-content {
           text-align: right;
         }
 
+        .stat-value {
+          font-size: 3rem;
+          font-weight: 800;
+          color: var(--text-primary);
+          line-height: 1;
+        }
+
         .stat-label {
-          font-size: 14px;
+          font-size: 0.875rem;
           color: var(--text-secondary);
           font-weight: 600;
           text-transform: uppercase;
-          letter-spacing: 0.8px;
-          margin-top: 8px;
+          letter-spacing: 1px;
+          margin-top: 0.5rem;
         }
 
-        /* Controls */
+        /* Controls Section */
         .controls-section {
           background: var(--bg-primary);
-          border-radius: 20px;
-          padding: 30px;
-          margin-bottom: 30px;
+          border-radius: 24px;
+          padding: 2rem;
+          margin-bottom: 2rem;
           box-shadow: 0 10px 40px var(--shadow);
           border: 1px solid var(--border-color);
+          animation: fadeInUp 1s ease-out;
         }
 
         .controls-row {
           display: flex;
-          gap: 20px;
+          gap: 1.5rem;
           align-items: center;
           flex-wrap: wrap;
         }
@@ -707,37 +698,37 @@ font-size: 15px;
 
         .search-input {
           width: 100%;
-          padding: 15px 20px 15px 50px;
+          padding: 1rem 1.25rem 1rem 3.5rem;
           border: 2px solid var(--border-color);
-          border-radius: 12px;
+          border-radius: 16px;
           background: var(--bg-secondary);
           color: var(--text-primary);
-          font-size: 16px;
+          font-size: 1rem;
           transition: all 0.3s ease;
         }
 
         .search-input:focus {
           outline: none;
           border-color: #6a8e4e;
-          box-shadow: 0 0 0 3px rgba(106, 142, 78, 0.1);
+          box-shadow: 0 0 0 4px rgba(106, 142, 78, 0.1);
         }
 
         .search-icon {
           position: absolute;
-          left: 18px;
+          left: 1.25rem;
           top: 50%;
           transform: translateY(-50%);
           color: var(--text-secondary);
         }
 
         .filter-select {
-          padding: 15px 20px;
+          padding: 1rem 1.25rem;
           border: 2px solid var(--border-color);
-          border-radius: 12px;
+          border-radius: 16px;
           background: var(--bg-secondary);
           color: var(--text-primary);
-          font-size: 16px;
-          min-width: 180px;
+          font-size: 1rem;
+          min-width: 200px;
           cursor: pointer;
           transition: all 0.3s ease;
         }
@@ -745,79 +736,67 @@ font-size: 15px;
         .filter-select:focus {
           outline: none;
           border-color: #6a8e4e;
-          box-shadow: 0 0 0 3px rgba(106, 142, 78, 0.1);
+          box-shadow: 0 0 0 4px rgba(106, 142, 78, 0.1);
         }
 
         .btn {
-          padding: 15px 25px;
+          padding: 1rem 1.5rem;
           border: none;
-          border-radius: 12px;
-          font-size: 16px;
+          border-radius: 16px;
+          font-size: 1rem;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.3s ease;
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 0.75rem;
           white-space: nowrap;
         }
 
         .btn-primary {
-          background: linear-gradient(135deg, #6a8e4e, #4a6b3a);
+          background: var(--gradient-primary);
           color: white;
-          box-shadow: 0 8px 25px rgba(106, 142, 78, 0.3);
+          box-shadow: 0 10px 30px rgba(106, 142, 78, 0.3);
         }
 
         .btn-primary:hover {
           transform: translateY(-3px);
-          box-shadow: 0 12px 35px rgba(106, 142, 78, 0.4);
+          box-shadow: 0 15px 40px rgba(106, 142, 78, 0.4);
         }
 
-        .btn-secondary {
-          background: var(--bg-secondary);
-          color: var(--text-primary);
-          border: 2px solid var(--border-color);
+        /* Content Sections */
+        .content-container {
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
         }
 
-        .btn-secondary:hover {
-          border-color: #6a8e4e;
-          background: rgba(106, 142, 78, 0.1);
-        }
-
-        /* Content Grid */
-        .content-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 30px;
-        }
-
-        /* Table */
-        .table-container {
+        /* Table Section */
+        .table-section {
           background: var(--bg-primary);
-          border-radius: 20px;
-          padding: 2%;
+          border-radius: 24px;
+          padding: 2rem;
           box-shadow: 0 10px 40px var(--shadow);
           border: 1px solid var(--border-color);
-          overflow: hidden;
+          animation: fadeInUp 1.2s ease-out;
         }
 
-        .table-header {
+        .section-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 25px;
-          padding-bottom: 20px;
-          padding-top: 2% ;
+          margin-bottom: 2rem;
+          padding-bottom: 1.5rem;
           border-bottom: 2px solid var(--border-color);
         }
 
-        .table-title {
-          font-size: 20px;
+        .section-title {
+          font-size: 1.5rem;
           font-weight: 700;
           color: var(--text-primary);
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 0.75rem;
         }
 
         .table {
@@ -827,7 +806,7 @@ font-size: 15px;
 
         .table th,
         .table td {
-          padding: 16px;
+          padding: 1.25rem 1rem;
           text-align: left;
           border-bottom: 1px solid var(--border-color);
         }
@@ -836,14 +815,14 @@ font-size: 15px;
           background: var(--bg-secondary);
           font-weight: 700;
           color: var(--text-secondary);
-          font-size: 14px;
+          font-size: 0.875rem;
           text-transform: uppercase;
           letter-spacing: 1px;
         }
 
         .table td {
           color: var(--text-primary);
-          font-size: 15px;
+          font-size: 1rem;
         }
 
         .table tbody tr {
@@ -852,16 +831,17 @@ font-size: 15px;
 
         .table tbody tr:hover {
           background: var(--bg-secondary);
-          transform: scale(1.01);
+          transform: scale(1.005);
         }
 
         .type-badge {
-          padding: 6px 16px;
-          border-radius: 25px;
-          font-size: 12px;
+          padding: 0.5rem 1rem;
+          border-radius: 20px;
+          font-size: 0.75rem;
           font-weight: 700;
           text-transform: uppercase;
-          letter-spacing: 0.8px;
+          letter-spacing: 1px;
+          display: inline-block;
         }
 
         .type-badge.critique {
@@ -871,20 +851,20 @@ font-size: 15px;
         }
 
         .type-badge.non-critique {
-          background: rgba(106, 142, 78, 0.15);
+          background: rgba(39, 174, 96, 0.15);
           color: #27ae60;
-          border: 2px solid rgba(106, 142, 78, 0.3);
+          border: 2px solid rgba(39, 174, 96, 0.3);
         }
 
         .action-buttons {
           display: flex;
-          gap: 10px;
+          gap: 0.5rem;
         }
 
         .btn-icon {
-          padding: 10px;
+          padding: 0.75rem;
           border: none;
-          border-radius: 8px;
+          border-radius: 12px;
           cursor: pointer;
           transition: all 0.3s ease;
           display: flex;
@@ -900,7 +880,7 @@ font-size: 15px;
 
         .btn-edit:hover {
           background: rgba(52, 152, 219, 0.25);
-          transform: scale(1.15);
+          transform: scale(1.1);
         }
 
         .btn-delete {
@@ -911,80 +891,65 @@ font-size: 15px;
 
         .btn-delete:hover {
           background: rgba(231, 76, 60, 0.25);
-          transform: scale(1.15);
+          transform: scale(1.1);
         }
 
-        /* Map */
-        .map-container {
+        /* Map Section */
+        .map-section {
           background: var(--bg-primary);
-          border-radius: 20px;
-          padding: 30px;
+          border-radius: 24px;
+          padding: 2rem;
           box-shadow: 0 10px 40px var(--shadow);
           border: 1px solid var(--border-color);
-          height: 100%;
-        }
-
-        .map-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 25px;
-          padding-bottom: 20px;
-          border-bottom: 2px solid var(--border-color);
-        }
-
-        .map-title {
-          font-size: 20px;
-          font-weight: 700;
-          color: var(--text-primary);
-          display: flex;
-          align-items: center;
-          gap: 12px;
+          animation: fadeInUp 1.4s ease-out;
         }
 
         .leaflet-container {
-          height: 500px;
-          border-radius: 16px;
+          height: 600px;
+          border-radius: 20px;
           overflow: hidden;
-          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
         }
 
-        /* Modal */
+        /* Modal Styles */
         .modal-overlay {
           position: fixed;
           top: 0;
           left: 0;
           right: 0;
           bottom: 0;
-          background: rgba(0, 0, 0, 0.75);
+          background: rgba(0, 0, 0, 0.8);
           display: flex;
           align-items: center;
           justify-content: center;
           z-index: 1000;
           animation: fadeIn 0.3s ease-out;
+          backdrop-filter: blur(5px);
         }
 
         .modal {
           background: var(--bg-primary);
-          border-radius: 20px;
-          padding: 40px;
+          border-radius: 24px;
+          padding: 2.5rem;
           width: 90%;
-          max-width: 550px;
-          box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+          max-width: 600px;
+          box-shadow: 0 30px 100px rgba(0, 0, 0, 0.3);
           animation: slideUp 0.3s ease-out;
+          max-height: 90vh;
+          overflow-y: auto;
         }
 
         .modal-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 30px;
-          padding-bottom: 20px;
+          margin-bottom: 2rem;
+          padding-bottom: 1.5rem;
           border-bottom: 2px solid var(--border-color);
         }
 
         .modal-title {
-          font-size: 24px;
+          font-size: 1.75rem;
           font-weight: 700;
           color: var(--text-primary);
         }
@@ -992,11 +957,11 @@ font-size: 15px;
         .btn-close {
           background: none;
           border: none;
-          font-size: 28px;
+          font-size: 2rem;
           cursor: pointer;
           color: var(--text-secondary);
-          padding: 8px;
-          border-radius: 8px;
+          padding: 0.5rem;
+          border-radius: 12px;
           transition: all 0.3s ease;
         }
 
@@ -1006,61 +971,62 @@ font-size: 15px;
         }
 
         .form-group {
-          margin-bottom: 25px;
+          margin-bottom: 2rem;
         }
 
         .form-label {
           display: block;
-          margin-bottom: 10px;
+          margin-bottom: 0.75rem;
           font-weight: 600;
           color: var(--text-primary);
-          font-size: 16px;
+          font-size: 1rem;
         }
 
         .form-input, .form-select {
           width: 100%;
-          padding: 15px 20px;
+          padding: 1rem 1.25rem;
           border: 2px solid var(--border-color);
-          border-radius: 12px;
+          border-radius: 16px;
           background: var(--bg-secondary);
           color: var(--text-primary);
-          font-size: 16px;
+          font-size: 1rem;
           transition: all 0.3s ease;
         }
 
         .form-input:focus, .form-select:focus {
           outline: none;
           border-color: #6a8e4e;
-          box-shadow: 0 0 0 3px rgba(106, 142, 78, 0.1);
+          box-shadow: 0 0 0 4px rgba(106, 142, 78, 0.1);
         }
 
         .form-row {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 20px;
+          gap: 1.5rem;
         }
 
         .modal-actions {
           display: flex;
-          gap: 15px;
+          gap: 1rem;
           justify-content: flex-end;
-          margin-top: 35px;
-          padding-top: 25px;
+          margin-top: 2.5rem;
+          padding-top: 2rem;
           border-top: 2px solid var(--border-color);
         }
 
-        /* Loading */
-        .loading {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          height: 250px;
-          color: var(--text-secondary);
-          font-size: 18px;
-          font-weight: 500;
+        .btn-secondary {
+          background: var(--bg-secondary);
+          color: var(--text-primary);
+          border: 2px solid var(--border-color);
         }
 
-        .empty-state {
+        .btn-secondary:hover {
+          border-color: #6a8e4e;
+          background: rgba(106, 142, 78, 0.1);
+        }
+
+        /* Loading and Empty States */
+        .loading, .empty-state {
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -1070,17 +1036,27 @@ font-size: 15px;
           text-align: center;
         }
 
+        .loading {
+          font-size: 1.125rem;
+          font-weight: 500;
+        }
+
         .empty-state h3 {
-          font-size: 20px;
-          margin-bottom: 10px;
+          font-size: 1.5rem;
+          margin-bottom: 0.75rem;
           color: var(--text-primary);
+        }
+
+        .empty-state p {
+          font-size: 1rem;
+          max-width: 400px;
         }
 
         /* Animations */
         @keyframes fadeInUp {
           from {
             opacity: 0;
-            transform: translateY(40px);
+            transform: translateY(60px);
           }
           to {
             opacity: 1;
@@ -1096,7 +1072,7 @@ font-size: 15px;
         @keyframes slideUp {
           from {
             opacity: 0;
-            transform: translateY(60px) scale(0.95);
+            transform: translateY(80px) scale(0.95);
           }
           to {
             opacity: 1;
@@ -1104,16 +1080,32 @@ font-size: 15px;
           }
         }
 
-        /* Responsive */
+        /* Responsive Design */
         @media (max-width: 1200px) {
-          .content-grid {
-            grid-template-columns: 1fr;
+          .consumers-title {
+            font-size: 2.5rem;
+          }
+          
+          .leaflet-container {
+            height: 500px;
           }
         }
         
         @media (max-width: 768px) {
           .consumers-container {
-            padding: 20px;
+            padding: 1.5rem;
+          }
+
+          .consumers-title {
+            font-size: 2rem;
+          }
+
+          .consumers-subtitle {
+            font-size: 1rem;
+          }
+
+          .stats-grid {
+            grid-template-columns: 1fr;
           }
 
           .controls-row {
@@ -1131,66 +1123,68 @@ font-size: 15px;
 
           .modal {
             width: 95%;
-            padding: 30px 20px;
+            padding: 2rem 1.5rem;
           }
 
-          .table-container {
+          .table-section {
             overflow-x: auto;
           }
 
-          .stats-grid {
-            grid-template-columns: 1fr;
+          .leaflet-container {
+            height: 400px;
           }
 
-          .consumers-title {
-            font-size: 28px;
+          .stat-value {
+            font-size: 2.5rem;
           }
         }
       `}</style>
 
       <div className="consumers-container">
         {/* Header */}
-        <div className="consumers-header">
-          <h1 className="consumers-title">Gestion des Consommateurs</h1>
-          <p className="consumers-subtitle">
+        <div className="distribution-header">
+          <h1 className="distribution-title">Gestion des Consommateurs</h1>
+          <p className="distribution-subtitle">
             Administration et localisation des consommateurs du microgrid
           </p>
         </div>
 
-        {/* Stats */}
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-header">
-              <div className="stat-icon total">
-                <Users size={28} />
-              </div>
-              <div>
-                <div className="stat-value">{stats.total}</div>
-                <div className="stat-label">Total</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="stat-card critical">
-            <div className="stat-header">
-              <div className="stat-icon critical">
-                <AlertTriangle size={28} />
-              </div>
-              <div>
-                <div className="stat-value">{stats.critique}</div>
-                <div className="stat-label">Critiques</div>
+        {/* Stats Section */}
+        <div className="stats-section">
+          <div className="stats-grid">
+            <div className="stat-card total">
+              <div className="stat-header">
+                <div className="stat-icon total">
+                  <Users size={32} />
+                </div>
+                <div className="stat-content">
+                  <div className="stat-value">{stats.total}</div>
+                  <div className="stat-label">Total</div>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="stat-card non-critical">
-            <div className="stat-header">
-              <div className="stat-icon non-critical">
-                <CheckCircle size={28} />
+            <div className="stat-card critical">
+              <div className="stat-header">
+                <div className="stat-icon critical">
+                  <AlertTriangle size={32} />
+                </div>
+                <div className="stat-content">
+                  <div className="stat-value">{stats.critique}</div>
+                  <div className="stat-label">Critiques</div>
+                </div>
               </div>
-              <div>
-                <div className="stat-value">{stats.nonCritique}</div>
-                <div className="stat-label">Non Critiques</div>
+            </div>
+
+            <div className="stat-card non-critical">
+              <div className="stat-header">
+                <div className="stat-icon non-critical">
+                  <CheckCircle size={32} />
+                </div>
+                <div className="stat-content">
+                  <div className="stat-value">{stats.nonCritique}</div>
+                  <div className="stat-label">Non Critiques</div>
+                </div>
               </div>
             </div>
           </div>
@@ -1227,35 +1221,30 @@ font-size: 15px;
               <Plus size={20} />
               Nouveau
             </button>
-{/* 
-            <button
-              className="btn btn-secondary"
-              onClick={handleExport}
-            >
-              <Download size={20} />
-              Export 
-            </button> */}
-            <ExportButton filteredConsumers={filteredConsumers} />
 
+            <ExportButton filteredConsumers={filteredConsumers} />
           </div>
         </div>
 
-        {/* Content Grid */}
-        <div className="content-grid">
-          {/* Table */}
-          <div className="table-container">
-            <div className="table-header">
-              <h3 className="table-title">
-                <Users size={24} />
+        {/* Content Container */}
+        <div className="content-container">
+          {/* Table Section */}
+          <div className="table-section">
+            <div className="section-header">
+              <h3 className="section-title">
+                <Users size={28} />
                 Liste des Consommateurs
               </h3>
             </div>
 
             {loading ? (
-              <div className="loading">Chargement des données...</div>
+              <div className="loading">
+                <Users size={48} />
+                <p>Chargement des données...</p>
+              </div>
             ) : filteredConsumers.length === 0 ? (
               <div className="empty-state">
-                <Users size={48} />
+                <Users size={64} />
                 <h3>Aucun consommateur trouvé</h3>
                 <p>
                   {searchTerm || filterType !== 'all' 
@@ -1320,21 +1309,20 @@ font-size: 15px;
             )}
           </div>
 
-          {/* Map */}
-          <div className="map-container">
-            <div className="map-header">
-              <h3 className="map-title">
-                <MapPin size={24} />
+          {/* Map Section */}
+          <div className="map-section">
+            <div className="section-header">
+              <h3 className="section-title">
+                <MapPin size={28} />
                 Localisation des Consommateurs
               </h3>
             </div>
 
-<MapContainer
-  center={[32.2314, -7.9390]} // Coordonnées Green Energy Park
-  zoom={13} // Zoom plus proche pour bien voir
-  className="leaflet-container"
->
-
+            <MapContainer
+              center={[32.2314, -7.9390]}
+              zoom={13}
+              className="leaflet-container"
+            >
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -1346,17 +1334,19 @@ font-size: 15px;
                   icon={consumer.type === 'critique' ? criticalIcon : nonCriticalIcon}
                 >
                   <Popup>
-                    <div style={{ textAlign: 'center', padding: '8px' }}>
-                      <strong style={{ fontSize: '16px' }}>{consumer.name}</strong>
-                      <br />
+                    <div style={{ textAlign: 'center', padding: '12px' }}>
+                      <strong style={{ fontSize: '16px', display: 'block', marginBottom: '8px' }}>
+                        {consumer.name}
+                      </strong>
                       <span style={{ 
                         color: consumer.type === 'critique' ? '#e74c3c' : '#27ae60',
                         fontWeight: 'bold',
-                        fontSize: '14px'
+                        fontSize: '14px',
+                        display: 'block',
+                        marginBottom: '6px'
                       }}>
                         {consumer.type}
                       </span>
-                      <br />
                       <small style={{ color: '#7f8c8d', fontSize: '12px' }}>
                         {consumer.latitude.toFixed(4)}, {consumer.longitude.toFixed(4)}
                       </small>
@@ -1416,7 +1406,7 @@ font-size: 15px;
                       className="form-input"
                       value={formData.latitude}
                       onChange={(e) => setFormData({...formData, latitude: e.target.value})}
-                      placeholder="35.8833"
+                      placeholder="32.2314"
                       required
                     />
                   </div>
@@ -1429,7 +1419,7 @@ font-size: 15px;
                       className="form-input"
                       value={formData.longitude}
                       onChange={(e) => setFormData({...formData, longitude: e.target.value})}
-                      placeholder="9.1167"
+                      placeholder="-7.9390"
                       required
                     />
                   </div>

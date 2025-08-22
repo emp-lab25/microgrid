@@ -24,15 +24,22 @@ export default function Distribution() {
     year: "numeric",
   });
 
-  // Garder que l'heure
-  const formatDataWithHour = (data) =>
-    data.map((d) => ({
+const formatDataWithHour = (data) => {
+  const now = new Date(); // heure actuelle
+
+  return data
+    .map((d) => ({
       ...d,
+      dateObj: new Date(d.timestamp), // garder l'objet Date pour filtrage
       timestamp: new Date(d.timestamp).toLocaleTimeString("fr-FR", {
         hour: "2-digit",
         minute: "2-digit",
       }),
-    }));
+    }))
+    .filter((d) => d.dateObj <= now); // ne garder que les heures <= maintenant
+};
+
+
 
   const [consumptionTotalData, setConsumptionTotalData] = useState([]);
   const [consumptionBreakdownData, setConsumptionBreakdownData] = useState([]);

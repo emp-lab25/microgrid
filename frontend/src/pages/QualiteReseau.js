@@ -23,12 +23,11 @@ const handleExportPDF = async () => {
   if (!chartsRef.current) return;
 
   try {
-    // ✅ Capture avec meilleure qualité
     const canvas = await html2canvas(chartsRef.current, { 
-      scale: 3,  // augmente la netteté
-      useCORS: true // évite les problèmes si images externes
+      scale: 3,  
+      useCORS: true 
     });
-    const imgData = canvas.toDataURL("image/png", 1.0); // qualité max
+    const imgData = canvas.toDataURL("image/png", 1.0); 
 
     const pdf = new jsPDF("landscape", "mm", "a4");
     const imgWidth = pdf.internal.pageSize.getWidth() - 20; 
@@ -38,7 +37,6 @@ const handleExportPDF = async () => {
     pdf.setFontSize(18);
     pdf.text("Rapport : Qualité Réseau", 15, 15);
 
-    // ✅ Ajout du graphique
     pdf.addImage(
       imgData,
       "PNG",
@@ -48,7 +46,6 @@ const handleExportPDF = async () => {
       imgHeight > pageHeight ? pageHeight : imgHeight
     );
 
-    // ✅ Sauvegarde
     pdf.save(`qualite_reseau_${new Date().toISOString().split("T")[0]}.pdf`);
   } catch (error) {
     console.error("❌ Erreur export PDF :", error);
@@ -65,14 +62,20 @@ const handleExportPDF = async () => {
   });
 
   // Garder que l'heure
-  const formatDataWithHour = (data) =>
-    data.map((d) => ({
+const formatDataWithHour = (data) => {
+  const now = new Date(); 
+
+  return data
+    .map((d) => ({
       ...d,
+      dateObj: new Date(d.timestamp), 
       timestamp: new Date(d.timestamp).toLocaleTimeString("fr-FR", {
         hour: "2-digit",
         minute: "2-digit",
       }),
-    }));
+    }))
+    .filter((d) => d.dateObj <= now);
+};
 
   const [voltageFrequencyData, setVoltageFrequencyData] = useState([]);
   const [predictionData, setPredictionData] = useState([]);
@@ -97,6 +100,8 @@ const handleExportPDF = async () => {
       return;
     }
 
+
+
     async function fetchData() {
       try {
         const endpoints = {
@@ -114,6 +119,8 @@ const handleExportPDF = async () => {
           axios.get(endpoints.kpis),
           axios.get(endpoints.predict),
         ]);
+
+        
 
         // Logs pour inspecter la structure
         // console.log("⚡ voltageFrequencyRes:", voltageFrequencyRes);
@@ -227,15 +234,17 @@ const handleExportPDF = async () => {
                 stroke="var(--text-secondary)" 
                 fontSize={12}
               />
-              <YAxis
-              stroke="var(--text-secondary)"
-              fontSize={12}
-              label={{
-                value: lines[0].key, 
-                angle: -90,
-                position: "insideLeft",
-              }}
-            />
+           <YAxis
+  stroke="var(--text-secondary)"
+  fontSize={12}
+  label={{
+    value: lines[0].key,
+    angle: -90,
+    position: "insideLeft",
+    dy: 50,   // décale vers le bas
+  }}
+/>
+
               <Tooltip
                 contentStyle={{
                   backgroundColor: "var(--bg-secondary)",
@@ -291,15 +300,17 @@ const handleExportPDF = async () => {
 />
 
 
-            <YAxis
-              stroke="var(--text-secondary)"
-              fontSize={12}
-              label={{
-                value: lines[0].key, 
-                angle: -90,
-                position: "insideLeft",
-              }}
-            />
+          <YAxis
+  stroke="var(--text-secondary)"
+  fontSize={12}
+  label={{
+    value: lines[0].key,
+    angle: -90,
+    position: "insideLeft",
+    dy: 50,   // décale vers le bas
+  }}
+/>
+
             <Tooltip
               contentStyle={{
                 backgroundColor: "var(--bg-secondary)",
@@ -791,7 +802,7 @@ const handleExportPDF = async () => {
                   value={simulationInput.consumption}
                   onChange={(e) => setSimulationInput({
                     ...simulationInput,
-                    consumption: parseFloat(e.target.value) || 0
+      consumption: e.target.value === "" ? "" : parseFloat(e.target.value)
                   })}
                 />
               </div>
@@ -804,7 +815,7 @@ const handleExportPDF = async () => {
                   value={simulationInput.pv_production}
                   onChange={(e) => setSimulationInput({
                     ...simulationInput,
-                    pv_production: parseFloat(e.target.value) || 0
+                     pv_production: e.target.value === "" ? "" : parseFloat(e.target.value)
                   })}
                 />
               </div>
@@ -817,7 +828,7 @@ const handleExportPDF = async () => {
                   value={simulationInput.fc_production}
                   onChange={(e) => setSimulationInput({
                     ...simulationInput,
-                    fc_production: parseFloat(e.target.value) || 0
+                  fc_production: e.target.value === "" ? "" : parseFloat(e.target.value)
                   })}
                 />
               </div>
