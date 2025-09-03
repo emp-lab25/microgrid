@@ -94,7 +94,7 @@ def simulate_network(input_data: SimulationInput):
     """
     Simulation simple : variation de tension et fréquence selon la consommation et production.
     - Mode îlot : facteur d’amplification de variation
-    - Retourne liste de valeurs sur 24h simulées (exemple simple)
+    - Retourne liste de valeurs sur 24h simulées 
     """
     hours = list(range(24))
     results = []
