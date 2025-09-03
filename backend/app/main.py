@@ -78,7 +78,7 @@ fichiers = [
     os.path.join(DATA_DIR, "Dec_2022.csv"),
 ]
 
-import_csvs_to_db(fichiers)
+# import_csvs_to_db(fichiers)
 
 if __name__ == "__main__":
 
