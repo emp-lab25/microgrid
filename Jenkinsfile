@@ -69,6 +69,7 @@ pipeline {
                         // docker.image("${env.DOCKER_USERNAME}/${env.POSTGRES_IMAGE}:${env.IMAGE_TAG}").push('latest')
 
                         // Push Backend
+                        docker.image("${env.DOCKER_USERNAME}/${env.BACKEND_IMAGE}:${env.IMAGE_TAG}").push()
                         docker.image("${env.DOCKER_USERNAME}/${env.BACKEND_IMAGE}:${env.IMAGE_TAG}").push('latest')
                     }
                 }
