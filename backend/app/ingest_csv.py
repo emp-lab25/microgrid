@@ -2,7 +2,7 @@
 import pandas as pd
 import numpy as np
 from sqlalchemy.orm import Session
-from models.measurement import Measurement, Base
+from .models.measurement import Measurement, Base
 from database import engine, SessionLocal
 
 
