@@ -10,7 +10,7 @@ from .routers import distribution
 from .routers import consumers
 from .routers import network_quality
 
-from ingest_csv import import_csvs_to_db
+from .ingest_csv import import_csvs_to_db
 
 import uvicorn
 
@@ -65,8 +65,9 @@ print("-------------------------------------------------------------------------
 
 
 
+fichiers = ["data/Sep_2022.csv", "data/Dec_2022.csv"]
+import_csvs_to_db(fichiers)
+
 if __name__ == "__main__":
-    
-    fichiers = ["data/Sep_2022.csv", "data/Dec_2022.csv"]
-    import_csvs_to_db(fichiers)
+
     uvicorn.run(app, host="0.0.0.0", port=8011)
