@@ -65,7 +65,13 @@ print("-------------------------------------------------------------------------
 
 
 
-fichiers = ["data/Sep_2022.csv", "data/Dec_2022.csv"]
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+fichiers = [
+    os.path.join(BASE_DIR, "data", "Sep_2022.csv"),
+    os.path.join(BASE_DIR, "data", "Dec_2022.csv"),
+]
 import_csvs_to_db(fichiers)
 
 if __name__ == "__main__":
