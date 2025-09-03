@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: microgrid-backend
-          image: emp79/microgrid-backend:22
+          image: emp79/microgrid-backend:23
           ports:
             - containerPort: 8011
           env:
