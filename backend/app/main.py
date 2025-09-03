@@ -66,12 +66,18 @@ print("-------------------------------------------------------------------------
 
 
 import os
+
+# Répertoire de main.py
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# Dossier data est au même niveau que app/
+DATA_DIR = os.path.join(BASE_DIR, "..", "data")
+
 fichiers = [
-    os.path.join(BASE_DIR, "data", "Sep_2022.csv"),
-    os.path.join(BASE_DIR, "data", "Dec_2022.csv"),
+    os.path.join(DATA_DIR, "Sep_2022.csv"),
+    os.path.join(DATA_DIR, "Dec_2022.csv"),
 ]
+
 import_csvs_to_db(fichiers)
 
 if __name__ == "__main__":
